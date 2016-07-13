@@ -56,7 +56,7 @@ static usbd_device *stm32f107_usbd_init(void)
 
 	OTG_FS_GUSBCFG |= OTG_GUSBCFG_PHYSEL;
 	/* Enable VBUS sensing in device mode and power down the PHY. */
-	OTG_FS_GCCFG |= OTG_GCCFG_VBUSBSEN | OTG_GCCFG_PWRDWN;
+	OTG_FS_GCCFG |= OTG_GCCFG_VBUSBSEN | OTG_GCCFG_PWRDWN | OTG_GCCFG_NOVBUSSENS;
 
 	/* Wait for AHB idle. */
 	while (!(OTG_FS_GRSTCTL & OTG_GRSTCTL_AHBIDL));
