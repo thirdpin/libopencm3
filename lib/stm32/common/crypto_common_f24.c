@@ -138,6 +138,7 @@ void crypto_set_algorithm(enum crypto_mode mode)
 		/* module switches to DISABLE automatically */
 	}
 	/* set algo mode */
+	CRYP_CR = (CRYP_CR & ~CRYP_CR_ALGODIR);
 	CRYP_CR = (CRYP_CR & ~CRYP_CR_ALGOMODE) | mode;
 
 	/* flush buffers */
