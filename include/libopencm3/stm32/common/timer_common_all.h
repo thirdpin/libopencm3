@@ -776,8 +776,8 @@ depending on the level of the complementary input. */
 /* Note: CC2S bits are writable only when the channel is OFF (CC2E = 0 in
  * TIMx_CCER). */
 #define TIM_CCMR1_CC1S_OUT		(0x0 << 0)
-#define TIM_CCMR1_CC1S_IN_TI2		(0x2 << 0)
-#define TIM_CCMR1_CC1S_IN_TI1		(0x1 << 0)
+#define TIM_CCMR1_CC1S_IN_TI2		(0x1 << 0)
+#define TIM_CCMR1_CC1S_IN_TI1		(0x2 << 0)
 #define TIM_CCMR1_CC1S_IN_TRC		(0x3 << 0)
 #define TIM_CCMR1_CC1S_MASK		(0x3 << 0)
 
