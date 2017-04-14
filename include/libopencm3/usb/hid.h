@@ -51,8 +51,6 @@ struct usb_hid_descriptor {
 	uint16_t bcdHID;
 	uint8_t bCountryCode;
 	uint8_t bNumDescriptors;
-	uint8_t bReportType;
-	uint16_t wDescriptorLength;
 } __attribute__((packed));
 
 #define USB_DT_HID_SIZE  sizeof(usb_hid_descriptor)
