@@ -49,6 +49,8 @@ OBJS		+= usart_common_v2.o usart_common_all.o
 OBJS		+= usb.o usb_control.o usb_standard.o
 OBJS		+= st_usbfs_core.o st_usbfs_v1.o
 
+OBJS		+= sdio_common_all.o 
+
 VPATH += ../../usb:../:../../cm3:../common
 
 include ../../Makefile.include

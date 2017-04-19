@@ -27,7 +27,7 @@ space:=
 space+=
 SRCLIBDIR:= $(subst $(space),\$(space),$(realpath lib))
 
-TARGETS:= stm32/f2
+TARGETS:= stm32/f4
 
 # Be silent per default, but 'make V=1' will show all compiler calls.
 ifneq ($(V),1)
