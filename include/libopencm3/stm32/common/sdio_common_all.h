@@ -276,6 +276,11 @@ void sdio_ck_disable(void);
 clock (SDIO_CK): SDIO_CK frequency = SDIOCLK / [CLKDIV + 2].
 */
 void sdio_set_clock_divider(uint8_t divider);
+/**
+@brief Gets clock divider.
+@retval Clock divider
+*/
+uint8_t sdio_get_clock_divider(void);
 
 /* --- SDIO_ARG ------------------------------------------------------------------------------------- */
 /**

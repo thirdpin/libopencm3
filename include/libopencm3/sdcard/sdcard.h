@@ -277,12 +277,6 @@ typedef struct
 #define SD_CMD_SD_APP_SECURE_ERASE                 ((uint8_t)38) /*!< For SD Card only */
 #define SD_CMD_SD_APP_CHANGE_SECURE_AREA           ((uint8_t)49) /*!< For SD Card only */
 #define SD_CMD_SD_APP_SECURE_WRITE_MKB             ((uint8_t)48) /*!< For SD Card only */
-  
-/* Uncomment the following line to select the SDIO Data transfer mode */  
-#if !defined (SD_DMA_MODE) && !defined (SD_POLLING_MODE)
-#define SD_DMA_MODE                                ((uint32_t)0x00000000)
-/*#define SD_POLLING_MODE                            ((uint32_t)0x00000002)*/
-#endif
 
 /**
 * @brief  SD detection on its memory slot
@@ -310,30 +304,29 @@ BEGIN_DECLS
 
 SDCARD_Result sdcard_init(uint32_t apb_freq, uint32_t sdcard_freq);
 SDCARD_Result sdcard_power_on(void);
+SDCARD_Result sdcard_power_off(void);
 SDCARD_Result sdcard_cards_init(void);
 SDCARD_Result sdcard_get_card_info(SD_CardInfo *cardinfo);
 SDCARD_Result sdcard_select_deselect(uint64_t addr);
 SDCARD_Result sdcard_enable_wide_bus_operation(SDIO_WideBusMode mode);
+SDCARD_Result sdcard_read_block(uint8_t *readbuff, uint64_t ReadAddr, uint16_t BlockSize);
+SDCARD_Result sdcard_write_block(uint8_t *writebuff, uint64_t WriteAddr, uint16_t BlockSize);
+uint8_t sdcard_detect(void);
+SDCARD_Result sdcard_get_card_status(SD_CardStatus *cardstatus);
+SDCARD_Result sdcard_send_status(uint32_t *psdstatus);
+SDCARD_Result sdcard_erase(uint64_t startaddr, uint64_t endaddr);
+SDTransferState sdcard_get_status(void);
+// SDCARD_Result sdcard_wait_read_operation(void);
+// SDCARD_Result sdcard_wait_write_operation(void);
+SDCardState sdcard_get_state(void);
 
-
-// SDTransferState SD_GetStatus(void);
-// SDCardState SD_GetState(void);
-// uint8_t SD_Detect(void);
-// SD_Error SD_PowerOFF(void);
-// SD_Error SD_GetCardStatus(SD_CardStatus *cardstatus);
-// SD_Error SD_ReadBlock(uint8_t *readbuff, uint64_t ReadAddr, uint16_t BlockSize);
-// SD_Error SD_ReadMultiBlocks(uint8_t *readbuff, uint64_t ReadAddr, uint16_t BlockSize, uint32_t NumberOfBlocks);
-// SD_Error SD_WriteBlock(uint8_t *writebuff, uint64_t WriteAddr, uint16_t BlockSize);
+//SDCARD_Result sdcard_read_multi_blocks(uint8_t *readbuff, uint64_t ReadAddr, uint16_t BlockSize, uint32_t NumberOfBlocks);
 // SD_Error SD_WriteMultiBlocks(uint8_t *writebuff, uint64_t WriteAddr, uint16_t BlockSize, uint32_t NumberOfBlocks);
 // SDTransferState SD_GetTransferState(void);
 // SD_Error SD_StopTransfer(void);
-// SD_Error SD_Erase(uint64_t startaddr, uint64_t endaddr);
 // SD_Error SD_SendStatus(uint32_t *pcardstatus);
-// SD_Error SD_SendSDStatus(uint32_t *psdstatus);
 // SD_Error SD_ProcessIRQSrc(void);
 // void SD_ProcessDMAIRQ(void);
-// SD_Error SD_WaitReadOperation(void);
-// SD_Error SD_WaitWriteOperation(void);
 // SD_Error SD_HighSpeed(void);
 
 END_DECLS

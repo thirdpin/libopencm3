@@ -78,6 +78,11 @@ void sdio_set_clock_divider(uint8_t divider)
 	SDIO_CLKCR |= divider;
 }
 
+uint8_t sdio_get_clock_divider(void)
+{
+	return (SDIO_CLKCR & SDIO_CLKCR_CLKDIV_MSK);
+}
+
 void sdio_set_command_arg(uint32_t arg)
 {
 	SDIO_ARG = arg;
