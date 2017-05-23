@@ -1,8 +1,8 @@
 /** @defgroup sdio_defines SDIO Defines
 
-@brief <b>Defined Constants and Types for the STM32F4xx SDIO</b>
+@brief <b>Defined Constants and Types for the STM32F2xx SDIO</b>
 
-@ingroup STM32F4xx_defines
+@ingroup STM32F2xx_defines
 
 @version 1.0.0
 

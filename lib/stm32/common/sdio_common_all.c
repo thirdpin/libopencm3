@@ -1,65 +1,33 @@
 #include <libopencm3/stm32/sdio.h>
+#include <libopencm3/stm32/rcc.h>
 
-void sdio_enable()
+void sdio_deinit()
 {
-	SDIO_POWER &= ~SDIO_POWER_PWRCTRL_MASK;
-	SDIO_POWER |= SDIO_POWER_PWRCTRL_PWRON;
+	rcc_periph_reset_pulse(RST_SDIO);
 }
 
-void sdio_disable()
+void sdio_config(SDIO_config *config)
 {
-	SDIO_POWER &= ~SDIO_POWER_PWRCTRL_MASK;
-	SDIO_POWER |= SDIO_POWER_PWRCTRL_PWROFF;
-}
+	uint32_t reg_val = SDIO_CLKCR;
 
-void sdio_flow_control_enable()
-{
-	SDIO_CLKCR |= SDIO_CLKCR_HWFC_EN;
-}
+	reg_val &= SDIO_CLKCR_CLEAR_MASK;
 
-void sdio_flow_control_disable()
-{
-	SDIO_CLKCR &= ~SDIO_CLKCR_HWFC_EN;
-}
+	if(config->polarity == SDIO_CK_FALLING_EDGE)
+		reg_val |= SDIO_CLKCR_NEGEDGE;
 
-void sdio_set_ck_polarity(SDIO_CK_Polarity pol)
-{
-	switch(pol)
-	{
-		case SDIO_CK_RISING_EDGE:
-			SDIO_CLKCR &= ~SDIO_CLKCR_NEGEDGE;
-			break;
+	if(config->flow_control)
+		reg_val |= SDIO_CLKCR_HWFC_EN;
 
-		case SDIO_CK_FALLING_EDGE:
-			SDIO_CLKCR |= SDIO_CLKCR_NEGEDGE;
-			break;
-	}
-}
+	if(config->bypass)
+		reg_val |= SDIO_CLKCR_BYPASS;
 
-void sdio_set_wide_bus_mode(SDIO_WideBusMode mode)
-{
-	SDIO_CLKCR &= ~SDIO_CLKCR_WIDBUS_MASK;
-	SDIO_CLKCR |= mode;
-}
+	if(config->power_save)
+		reg_val |= SDIO_CLKCR_PWRSAV;
 
-void sdio_bypass_enable()
-{
-	SDIO_CLKCR |= SDIO_CLKCR_BYPASS;
-}
+	reg_val |= (uint32_t)config->bus_wide;
+	reg_val |= (uint32_t)config->clock_divider;
 
-void sdio_bypass_disable()
-{
-	SDIO_CLKCR &= ~SDIO_CLKCR_BYPASS;
-}
-
-void sdio_power_saving_enable()
-{
-	SDIO_CLKCR |= SDIO_CLKCR_PWRSAV;
-}
-
-void sdio_power_saving_disable()
-{
-	SDIO_CLKCR &= ~SDIO_CLKCR_PWRSAV;
+	SDIO_CLKCR = reg_val;
 }
 
 void sdio_ck_enable()
@@ -72,106 +40,48 @@ void sdio_ck_disable()
 	SDIO_CLKCR &= ~SDIO_CLKCR_CLKEN;
 }
 
-void sdio_set_clock_divider(uint8_t divider)
+void sdio_enable()
 {
-	SDIO_CLKCR &= ~SDIO_CLKCR_CLKDIV_MSK;
-	SDIO_CLKCR |= divider;
+	SDIO_POWER = SDIO_POWER_PWRCTRL_PWRON;
 }
 
-uint8_t sdio_get_clock_divider(void)
+void sdio_disable()
 {
-	return (SDIO_CLKCR & SDIO_CLKCR_CLKDIV_MSK);
+	SDIO_POWER = SDIO_POWER_PWRCTRL_PWROFF;
 }
 
-void sdio_set_command_arg(uint32_t arg)
+void sdio_send_command(SDIO_command *cmd)
 {
-	SDIO_ARG = arg;
-}
+	SDIO_ARG = cmd->arg;
 
-void sdio_CEATA_cmd_enable(void)
-{
-	SDIO_CMD |= SDIO_CMD_ATACMD;
-}
+	uint32_t reg_val = SDIO_CMD;
 
-void sdio_CEATA_cmd_disable(void)
-{
-	SDIO_CMD &= ~SDIO_CMD_ATACMD;
-}
+	reg_val &= SDIO_CMD_CLEAR_MASK;
 
-void sdio_CEATA_interrupt_enable(void)
-{
-	SDIO_CMD &= ~SDIO_CMD_NIEN;
-}
+	reg_val |= cmd->index;
+	reg_val |= cmd->response;
 
-void sdio_CEATA_interrupt_disable(void)
-{
-	SDIO_CMD |= SDIO_CMD_NIEN;
-}
-
-void sdio_completion_cmd_enable(void)
-{
-	SDIO_CMD |= SDIO_CMD_ENCMDCOMPL;
-}
-
-void sdio_completion_cmd_disable(void)
-{
-	SDIO_CMD &= ~SDIO_CMD_ENCMDCOMPL;
-}
-
-void sdio_suspend_cmd_enable(void)
-{
-	SDIO_CMD |= SDIO_CMD_SDIOSUSPEND;
-}
-
-void sdio_suspend_cmd_disable(void)
-{
-	SDIO_CMD &= ~SDIO_CMD_SDIOSUSPEND;
-}
-
-void sdio_CPSM_enable()
-{
-	SDIO_CMD |= SDIO_CMD_CPSMEN;
-}
-
-void sdio_CPSM_disable()
-{
-	SDIO_CMD &= ~SDIO_CMD_CPSMEN;
-}
-
-void sdio_set_wait_it(SDIO_WaitInterrupt wait_mode)
-{
-	SDIO_CMD &= ~SDIO_CMD_WAITPEND;
-	SDIO_CMD &= ~SDIO_CMD_WAITINT;
-
-	switch(wait_mode)
+	switch(cmd->wait)
 	{
 		case WAIT_NO:
 			break;
 		case WAIT_IT:
-			SDIO_CMD |= SDIO_CMD_WAITINT;
+			reg_val |= SDIO_CMD_WAITINT;
 			break;
 		case WAIT_PEND:
-			SDIO_CMD |= SDIO_CMD_WAITPEND;
+			reg_val |= SDIO_CMD_WAITPEND;
 			break;
 	}
-}
 
-void sdio_set_wait_response(SDIO_ResponseType response)
-{
-	SDIO_CMD &= ~SDIO_CMD_WAITRESP_MSK;
-	SDIO_CMD |= response;
-}
+	if (cmd->enable_CPSM)
+		reg_val |= SDIO_CMD_CPSMEN;
 
-void sdio_set_cmd_index(uint8_t index)
-{
-	index &= SDIO_CMD_CMDINDEX_MSK;
-	SDIO_CMD &= ~SDIO_CMD_CMDINDEX_MSK;
-	SDIO_CMD |= index;
+	SDIO_CMD = reg_val;
 }
 
 uint8_t sdio_get_cmd_response()
 {
-	return (uint8_t)(SDIO_RESPCMD & SDIO_RESPCMD_MSK);
+	return (uint8_t)(SDIO_RESPCMD);
 }
 
 uint32_t sdio_get_card_status_1()
@@ -194,71 +104,47 @@ uint32_t sdio_get_card_status_4()
 	return SDIO_RESP4;
 }
 
-void sdio_set_timeout_period(uint32_t period)
+void sdio_data_config(SDIO_data_config *config)
 {
-	SDIO_DTIMER = period;
+	SDIO_DTIMER = config->period;
+	SDIO_DLEN = config->length;
+
+	uint32_t tmpreg = SDIO_DCTRL;
+
+	tmpreg &= SDIO_DCTRL_CLEAR_MASK;
+
+	tmpreg |= config->size;
+
+	if (config->direction == CARD_TO_CONTROLLER)
+		tmpreg |= SDIO_DCTRL_DTDIR;
+
+	if (config->mode == STREAM_DATA_TRANSFER)
+		tmpreg |= SDIO_DCTRL_DTMODE;
+
+	if (config->enable)
+		tmpreg |= SDIO_DCTRL_DTEN;
+
+	SDIO_DCTRL = tmpreg;
 }
 
-uint32_t sdio_get_timeout_period()
+uint32_t sdio_get_data_counter(void)
 {
-	return SDIO_DTIMER;
+	return (SDIO_DCOUNT);
 }
 
-void sdio_set_data_length(uint32_t length)
+uint32_t sdio_read_fifo_data(void)
 {
-	SDIO_DLEN = (length & SDIO_DLEN_MSK);
+	return (SDIO_FIFO);
 }
 
-void sdio_data_transfer_enable(void)
+void sdio_write_fifo_data(uint32_t data)
 {
-	SDIO_DCTRL |= SDIO_DCTRL_DTEN;
+	SDIO_FIFO = data;
 }
 
-void sdio_data_transfer_disable(void)
+uint32_t sdio_get_fifo_counter(void)
 {
-	SDIO_DCTRL &= ~SDIO_DCTRL_DTEN;
-}
-
-void sdio_set_data_transfer_direction(SDIO_TransferDirection direction)
-{
-	switch(direction)
-	{
-		case CONTROLLER_TO_CARD:
-			SDIO_DCTRL &= ~SDIO_DCTRL_DTDIR;
-			break;
-		case CARD_TO_CONTROLLER:
-			SDIO_DCTRL |= SDIO_DCTRL_DTDIR;
-			break;
-	}
-}
-
-void sdio_set_data_transfer_mode(SDIO_TransferMode mode)
-{
-	switch(mode)
-	{
-		case BLOCK_DATA_TRANSFER:
-			SDIO_DCTRL &= ~SDIO_DCTRL_DTMODE;
-			break;
-		case STREAM_DATA_TRANSFER:
-			SDIO_DCTRL |= SDIO_DCTRL_DTMODE;
-			break;
-	}
-}
-
-void sdio_enable_dma(void)
-{
-	SDIO_DCTRL |= SDIO_DCTRL_DMAEN;
-}
-
-void sdio_disable_dma(void)
-{
-	SDIO_DCTRL &= ~SDIO_DCTRL_DMAEN;
-}
-
-void sdio_set_data_block_size(SDIO_BlockSize size)
-{
-	SDIO_DCTRL &= ~SDIO_DCTRL_DBLOCKSIZE_MSK;
-	SDIO_DCTRL |= size;
+	return (SDIO_FIFOCNT);
 }
 
 void sdio_read_wait_start_enable(void)
@@ -304,73 +190,75 @@ void sdio_operation_disable(void)
 	SDIO_DCTRL &= ~SDIO_DCTRL_SDIOEN;
 }
 
-uint32_t sdio_get_data_counter(void)
+void sdio_suspend_cmd_enable(void)
 {
-	return (SDIO_DCOUNT);
+	SDIO_CMD |= SDIO_CMD_SDIOSUSPEND;
 }
 
-bool sdio_get_flag_status(SDIO_Interrupt flag)
+void sdio_suspend_cmd_disable(void)
 {
-	return (bool)(SDIO_STA & flag);
+	SDIO_CMD &= ~SDIO_CMD_SDIOSUSPEND;
 }
 
-void sdio_clear_flag_status(SDIO_Interrupt flag)
+void sdio_completion_cmd_enable(void)
 {
-	SDIO_ICR |= flag;
+	SDIO_CMD |= SDIO_CMD_ENCMDCOMPL;
 }
 
-void sdio_clear_all_flag_status(uint32_t mask)
+void sdio_completion_cmd_disable(void)
 {
-	SDIO_ICR |= mask;
+	SDIO_CMD &= ~SDIO_CMD_ENCMDCOMPL;
 }
 
-void sdio_enable_interrupt(SDIO_Interrupt interrupt)
+void sdio_CEATA_interrupt_enable(void)
+{
+	SDIO_CMD &= ~SDIO_CMD_NIEN;
+}
+
+void sdio_CEATA_interrupt_disable(void)
+{
+	SDIO_CMD |= SDIO_CMD_NIEN;
+}
+
+void sdio_CEATA_cmd_enable(void)
+{
+	SDIO_CMD |= SDIO_CMD_ATACMD;
+}
+
+void sdio_CEATA_cmd_disable(void)
+{
+	SDIO_CMD &= ~SDIO_CMD_ATACMD;
+}
+
+void sdio_enable_dma(void)
+{
+	SDIO_DCTRL |= SDIO_DCTRL_DMAEN;
+}
+
+void sdio_disable_dma(void)
+{
+	SDIO_DCTRL &= ~SDIO_DCTRL_DMAEN;
+}
+
+void sdio_enable_interrupt(uint32_t interrupt)
 {
 	SDIO_MASK |= interrupt;
 }
 
-void sdio_disable_interrupt(SDIO_Interrupt interrupt)
+void sdio_disable_interrupt(uint32_t interrupt)
 {
 	SDIO_MASK &= ~interrupt;
 }
 
-void sdio_enable_all_interrupts(void)
+bool sdio_get_flag_status(uint32_t flag)
 {
-	SDIO_MASK |= SDIO_MASK_MSK;
-}
-
-void sdio_disable_all_interrupts(void)
-{
-	SDIO_MASK &= ~SDIO_MASK_MSK;
-}
-
-uint32_t sdio_get_fifo_counter(void)
-{
-	return (SDIO_FIFOCNT & SDIO_FIFOCNT_MSK);
-}
-
-uint32_t sdio_read_fifo_data(void)
-{
-	return (SDIO_FIFO);
-}
-
-void sdio_write_fifo_data(uint32_t data)
-{
-	SDIO_FIFO = data;
-}
-
-void sdio_send_command(uint8_t cmd_index, 
-	                   uint32_t cmd_arg, 
-	                   SDIO_ResponseType resp, 
-	                   SDIO_WaitInterrupt wait, 
-	                   bool enable_CPSM)
-{
-	sdio_set_cmd_index(cmd_index);
-	sdio_set_command_arg(cmd_arg);
-	sdio_set_wait_response(resp);
-	sdio_set_wait_it(wait);
-	if (enable_CPSM)
-		sdio_CPSM_enable();
+	if ((SDIO_STA & flag) != 0)
+		return true;
 	else
-		sdio_CPSM_disable();
+		return false;
+}
+
+void sdio_clear_flag_status(uint32_t flag)
+{
+	SDIO_ICR = flag;
 }
