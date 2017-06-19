@@ -37,6 +37,12 @@ void main(void);
 void blocking_handler(void);
 void null_handler(void);
 
+void hard_fault(void);
+void mem_manage(void);
+void bus_fault(void);
+void usage_fault(void);
+void debug_monitor(void);
+
 __attribute__ ((section(".vectors")))
 vector_table_t vector_table = {
 	.initial_sp_value = &_stack,
@@ -105,22 +111,44 @@ void blocking_handler(void)
 	while (1);
 }
 
+void hard_fault(void)
+{
+	while (1);
+}
+
+void mem_manage(void)
+{
+	while (1);
+}
+void bus_fault(void)
+{
+	while (1);
+}
+void usage_fault(void)
+{
+	while (1);
+}
+void debug_monitor(void)
+{
+	while (1);
+}
+
 void null_handler(void)
 {
 	/* Do nothing. */
 }
 
 #pragma weak nmi_handler = null_handler
-#pragma weak hard_fault_handler = blocking_handler
+#pragma weak hard_fault_handler = hard_fault
 #pragma weak sv_call_handler = null_handler
 #pragma weak pend_sv_handler = null_handler
 #pragma weak sys_tick_handler = null_handler
 
 /* Those are defined only on CM3 or CM4 */
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
-#pragma weak mem_manage_handler = blocking_handler
-#pragma weak bus_fault_handler = blocking_handler
-#pragma weak usage_fault_handler = blocking_handler
+#pragma weak mem_manage_handler = mem_manage
+#pragma weak bus_fault_handler = bus_fault
+#pragma weak usage_fault_handler = usage_fault
 #pragma weak debug_monitor_handler = null_handler
 #endif
 
