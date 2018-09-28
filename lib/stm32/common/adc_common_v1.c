@@ -1,4 +1,5 @@
-/** @addtogroup adc_file
+/** @addtogroup adc_file ADC peripheral API
+@ingroup peripheral_apis
 
 @author @htmlonly &copy; @endhtmlonly
 2009 Edward Cheeseman <evbuilder@users.sourceforge.net>
@@ -113,8 +114,7 @@ void adc_power_off(uint32_t adc)
 /** @brief ADC Enable Analog Watchdog for Regular Conversions
 
 The analog watchdog allows the monitoring of an analog signal between two
-threshold levels. The thresholds must be preset. Comparison is done before data
-alignment takes place, so the thresholds are left-aligned.
+threshold levels. The thresholds must be preset.
 
 @param[in] adc Unsigned int32. ADC block register address base @ref
 adc_reg_base.
@@ -529,7 +529,7 @@ void adc_set_single_conversion_mode(uint32_t adc)
 /** @brief ADC Set Analog Watchdog Upper Threshold
 
 @param[in] adc Unsigned int32. ADC block register address base @ref adc_reg_base
-@param[in] threshold Unsigned int8. Upper threshold value
+@param[in] threshold Upper threshold value, 12bit right aligned.
 */
 
 void adc_set_watchdog_high_threshold(uint32_t adc, uint16_t threshold)
@@ -545,7 +545,7 @@ void adc_set_watchdog_high_threshold(uint32_t adc, uint16_t threshold)
 /** @brief ADC Set Analog Watchdog Lower Threshold
 
 @param[in] adc Unsigned int32. ADC block register address base @ref adc_reg_base
-@param[in] threshold Unsigned int8. Lower threshold value
+@param[in] threshold Lower threshold value, 12bit right aligned.
 */
 
 void adc_set_watchdog_low_threshold(uint32_t adc, uint16_t threshold)
@@ -748,6 +748,32 @@ void adc_disable_dma(uint32_t adc)
 	ADC_CR2(adc) &= ~ADC_CR2_DMA;
 }
 
+/*---------------------------------------------------------------------------*/
+/** @brief Read a Status Flag.
 
+@param[in] adc Unsigned int32. ADC register address base @ref adc_reg_base
+@param[in] flag Unsigned int32. Status register flag  @ref adc_sr_values.
+@returns boolean: flag set.
+*/
+
+bool adc_get_flag(uint32_t adc, uint32_t flag)
+{
+	return ADC_SR(adc) & flag;
+}
+
+/*---------------------------------------------------------------------------*/
+/** @brief Clear a Status Flag.
+
+@param[in] adc Unsigned int32. ADC register address base @ref adc_reg_base
+@param[in] flag Unsigned int32. Status register flag  @ref adc_sr_values.
+*/
+
+void adc_clear_flag(uint32_t adc, uint32_t flag)
+{
+	/* All defined bits are 'r' or 'rc_w0' */
+	ADC_SR(adc) = ~flag;
+}
+
+/*---------------------------------------------------------------------------*/
 
 /**@}*/

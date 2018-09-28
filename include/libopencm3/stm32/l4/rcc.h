@@ -89,6 +89,7 @@
 #define RCC_CCIPR			MMIO32(RCC_BASE + 0x88)
 #define RCC_BDCR			MMIO32(RCC_BASE + 0x90)
 #define RCC_CSR				MMIO32(RCC_BASE + 0x94)
+#define RCC_CRRCR			MMIO32(RCC_BASE + 0x98)
 
 /* --- RCC_CR values ------------------------------------------------------- */
 
@@ -133,6 +134,10 @@ Twelve frequency ranges are available: 100 kHz, 200 kHz, 400 kHz, 800 kHz,
 #define RCC_CR_MSIRDY				(1 << 1)
 #define RCC_CR_MSION				(1 << 0)
 
+/* --- RCC_CRRCR values ---------------------------------------------------- */
+
+#define RCC_CRRCR_HSI48ON             (1 << 0)
+#define RCC_CRRCR_HSI48RDY            (1 << 1)
 
 /* --- RCC_ICSCR values ---------------------------------------------------- */
 
@@ -154,18 +159,19 @@ Twelve frequency ranges are available: 100 kHz, 200 kHz, 400 kHz, 800 kHz,
 #define RCC_CFGR_MCOPRE_DIV4	    2
 #define RCC_CFGR_MCOPRE_DIV8	    3
 #define RCC_CFGR_MCOPRE_DIV16	    4
-#define RCC_CFGR_MCOPRE_SHIFT	    27
+#define RCC_CFGR_MCOPRE_SHIFT	    28
 #define RCC_CFGR_MCOPRE_MASK	    0x7
 
 /* MCO: Microcontroller clock output */
 #define RCC_CFGR_MCO_NOCLK			0x0
 #define RCC_CFGR_MCO_SYSCLK			0x1
-#define RCC_CFGR_MCO_MSICLK			0x2
-#define RCC_CFGR_MCO_HSI16CLK			0x3
-#define RCC_CFGR_MCO_HSECLK			0x4
-#define RCC_CFGR_MCO_PLLCLK			0x5
-#define RCC_CFGR_MCO_LSICLK			0x6
-#define RCC_CFGR_MCO_LSECLK			0x7
+#define RCC_CFGR_MCO_MSI			0x2
+#define RCC_CFGR_MCO_HSI16			0x3
+#define RCC_CFGR_MCO_HSE			0x4
+#define RCC_CFGR_MCO_PLL			0x5
+#define RCC_CFGR_MCO_LSI			0x6
+#define RCC_CFGR_MCO_LSE			0x7
+#define RCC_CFGR_MCO_HSI48			0x8
 #define RCC_CFGR_MCO_SHIFT			24
 #define RCC_CFGR_MCO_MASK			0xf
 
@@ -274,6 +280,7 @@ Twelve frequency ranges are available: 100 kHz, 200 kHz, 400 kHz, 800 kHz,
 
 /* --- RCC_CIER - Clock interrupt enable register -------------------------- */
 
+#define RCC_CIER_HSI48RDYIE			(1 << 10)
 #define RCC_CIER_LSE_CSSIE			(1 << 9)
 /* OSC ready interrupt enable bits */
 #define RCC_CIER_PLLSAI2RDYIE			(1 << 7)
@@ -287,6 +294,7 @@ Twelve frequency ranges are available: 100 kHz, 200 kHz, 400 kHz, 800 kHz,
 
 /* --- RCC_CIFR - Clock interrupt flag register */
 
+#define RCC_CIFR_HSI48RDYF			(1 << 10)
 #define RCC_CIFR_LSECSSF			(1 << 9)
 #define RCC_CIFR_CSSF				(1 << 8)
 #define RCC_CIFR_PLLSAI2RDYF			(1 << 7)
@@ -300,6 +308,7 @@ Twelve frequency ranges are available: 100 kHz, 200 kHz, 400 kHz, 800 kHz,
 
 /* --- RCC_CICR - Clock interrupt clear register */
 
+#define RCC_CICR_HSI48RDYC			(1 << 10)
 #define RCC_CICR_LSECSSC			(1 << 9)
 #define RCC_CICR_CSSC				(1 << 8)
 #define RCC_CICR_PLLSAI2RDYC			(1 << 7)
@@ -578,7 +587,7 @@ Twelve frequency ranges are available: 100 kHz, 200 kHz, 400 kHz, 800 kHz,
 #define RCC_CCIPR_ADCSEL_MASK		0x3
 #define RCC_CCIPR_ADCSEL_SHIFT		28
 
-#define RCC_CCIPR_CLK48SEL_NONE		0
+#define RCC_CCIPR_CLK48SEL_HSI48	0
 #define RCC_CCIPR_CLK48SEL_PLLSAI1Q	1
 #define RCC_CCIPR_CLK48SEL_PLL		2
 #define RCC_CCIPR_CLK48SEL_MSI		3
@@ -678,6 +687,9 @@ Twelve frequency ranges are available: 100 kHz, 200 kHz, 400 kHz, 800 kHz,
 #define RCC_CSR_OBLRSTF				(1 << 25)
 #define RCC_CSR_FWRSTF				(1 << 24)
 #define RCC_CSR_RMVF				(1 << 23)
+#define RCC_CSR_RESET_FLAGS	(RCC_CSR_LPWRRSTF | RCC_CSR_WWDGRSTF |\
+		RCC_CSR_IWDGRSTF | RCC_CSR_SFTRSTF | RCC_CSR_BORRSTF |\
+		RCC_CSR_PINRSTF | RCC_CSR_OBLRSTF | RCC_CSR_FWRSTF)
 
 /** @defgroup rcc_csr_msirange MSI Range after standby values
 @brief Range of the MSI oscillator after returning from standby
@@ -703,8 +715,10 @@ extern uint32_t rcc_apb2_frequency;
 
 /* --- Function prototypes ------------------------------------------------- */
 
+// Note: RCC_HSI48 not available on all STM32L4 devices
+
 enum rcc_osc {
-	RCC_PLL, RCC_HSE, RCC_HSI16, RCC_MSI, RCC_LSE, RCC_LSI
+	RCC_PLL, RCC_HSE, RCC_HSI16, RCC_MSI, RCC_LSE, RCC_LSI, RCC_HSI48
 };
 
 
@@ -743,7 +757,9 @@ enum rcc_periph_clken {
 	RCC_OPAMP = _REG_BIT(RCC_APB1ENR1_OFFSET, 30),
 	RCC_DAC1 = _REG_BIT(RCC_APB1ENR1_OFFSET, 29),
 	RCC_PWR = _REG_BIT(RCC_APB1ENR1_OFFSET, 28),
+	RCC_USB = _REG_BIT(RCC_APB1ENR1_OFFSET, 26),
 	RCC_CAN1 = _REG_BIT(RCC_APB1ENR1_OFFSET, 25),
+	RCC_CRS = _REG_BIT(RCC_APB1ENR1_OFFSET, 24),
 	RCC_I2C3 = _REG_BIT(RCC_APB1ENR1_OFFSET, 23),
 	RCC_I2C2 = _REG_BIT(RCC_APB1ENR1_OFFSET, 22),
 	RCC_I2C1 = _REG_BIT(RCC_APB1ENR1_OFFSET, 21),
@@ -883,7 +899,9 @@ enum rcc_periph_rst {
 	RST_OPAMP = _REG_BIT(RCC_APB1RSTR1_OFFSET, 30),
 	RST_DAC1 = _REG_BIT(RCC_APB1RSTR1_OFFSET, 29),
 	RST_PWR = _REG_BIT(RCC_APB1RSTR1_OFFSET, 28),
+	RST_USB = _REG_BIT(RCC_APB1RSTR1_OFFSET, 26),
 	RST_CAN1 = _REG_BIT(RCC_APB1RSTR1_OFFSET, 25),
+	RST_CRS = _REG_BIT(RCC_APB1RSTR1_OFFSET, 24),
 	RST_I2C3 = _REG_BIT(RCC_APB1RSTR1_OFFSET, 23),
 	RST_I2C2 = _REG_BIT(RCC_APB1RSTR1_OFFSET, 22),
 	RST_I2C1 = _REG_BIT(RCC_APB1RSTR1_OFFSET, 21),
@@ -930,15 +948,11 @@ void rcc_osc_ready_int_disable(enum rcc_osc osc);
 int rcc_osc_ready_int_flag(enum rcc_osc osc);
 void rcc_css_int_clear(void);
 int rcc_css_int_flag(void);
-bool rcc_is_osc_ready(enum rcc_osc osc);
-void rcc_wait_for_osc_ready(enum rcc_osc osc);
 void rcc_wait_for_sysclk_status(enum rcc_osc osc);
 void rcc_osc_on(enum rcc_osc osc);
 void rcc_osc_off(enum rcc_osc osc);
 void rcc_css_enable(void);
 void rcc_css_disable(void);
-void rcc_osc_bypass_enable(enum rcc_osc osc);
-void rcc_osc_bypass_disable(enum rcc_osc osc);
 void rcc_set_sysclk_source(uint32_t clk);
 void rcc_set_pll_source(uint32_t pllsrc);
 void rcc_set_ppre2(uint32_t ppre2);

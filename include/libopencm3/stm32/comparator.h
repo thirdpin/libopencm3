@@ -1,4 +1,4 @@
-/* This provides unification of code over STM32F subfamilies */
+/* This provides unification of code over STM32 subfamilies */
 
 /*
  * This file is part of the libopencm3 project.
@@ -22,7 +22,8 @@
 
 #if defined(STM32F0)
 #       include <libopencm3/stm32/f0/comparator.h>
+#elif defined(STM32F3)
+#       include <libopencm3/stm32/f3/comparator.h>
 #else
 #       error "stm32 family not defined."
 #endif
-

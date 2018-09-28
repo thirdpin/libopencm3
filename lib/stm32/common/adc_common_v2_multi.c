@@ -1,4 +1,5 @@
-/** @addtogroup adc_file
+/** @addtogroup adc_file ADC peripheral API
+@ingroup peripheral_apis
 
 @author @htmlonly &copy; @endhtmlonly
 2016 Karl Palsson <karlp@tweak.net.au>
@@ -127,3 +128,6 @@ void adc_set_regular_sequence(uint32_t adc, uint8_t length, uint8_t channel[])
 	ADC_SQR3(adc) = reg32_3;
 	ADC_SQR4(adc) = reg32_4;
 }
+
+/**@}*/
+

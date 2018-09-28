@@ -257,7 +257,7 @@ LGPL License Terms @ref lgpl_license
 #define CAN_TSR_CODE_MASK		(0x3 << 24)
 
 /* ABRQ2: Abort request for mailbox 2 */
-#define CAN_TSR_TABRQ2			(1 << 23)
+#define CAN_TSR_ABRQ2			(1 << 23)
 
 /* 22:20 Reserved, forced by hardware to 0 */
 
@@ -315,7 +315,7 @@ LGPL License Terms @ref lgpl_license
 #define CAN_RF0R_RFOM0			(1 << 5)
 
 /* FOVR0: FIFO 0 overrun */
-#define CAN_RF0R_FAVR0			(1 << 4)
+#define CAN_RF0R_FOVR0			(1 << 4)
 
 /* FULL0: FIFO 0 full */
 #define CAN_RF0R_FULL0			(1 << 3)
@@ -333,7 +333,7 @@ LGPL License Terms @ref lgpl_license
 #define CAN_RF1R_RFOM1			(1 << 5)
 
 /* FOVR1: FIFO 1 overrun */
-#define CAN_RF1R_FAVR1			(1 << 4)
+#define CAN_RF1R_FOVR1			(1 << 4)
 
 /* FULL1: FIFO 1 full */
 #define CAN_RF1R_FULL1			(1 << 3)
@@ -480,7 +480,7 @@ LGPL License Terms @ref lgpl_license
 /* 15:10 Reserved, forced by hardware to 0 */
 
 /* BRP[9:0]: Baud rate prescaler */
-#define CAN_BTR_BRP_MASK		(0x1FFUL << 0)
+#define CAN_BTR_BRP_MASK		(0x3FFUL << 0)
 
 /* --- CAN_TIxR values ------------------------------------------------------ */
 
@@ -553,8 +553,8 @@ LGPL License Terms @ref lgpl_license
 /* --- CAN_RDTxR values ----------------------------------------------------- */
 
 /* TIME[15:0]: Message time stamp */
-#define CAN_RDTxR_TIME_MASK		(0xFFFF << 15)
-#define CAN_RDTxR_TIME_SHIFT		15
+#define CAN_RDTxR_TIME_MASK		(0xFFFF << 16)
+#define CAN_RDTxR_TIME_SHIFT		16
 
 /* FMI[7:0]: Filter match index */
 #define CAN_RDTxR_FMI_MASK		(0xFF << 8)
@@ -588,8 +588,8 @@ LGPL License Terms @ref lgpl_license
  * CAN2SB[5:0]: CAN2 start bank
  * (only on connectivity line devices otherwise reserved)
  */
-#define CAN_FMR_CAN2SB_MASK		(0x3F << 8)
-#define CAN_FMR_CAN2SB_SHIFT		15
+#define CAN_FMR_CAN2SB_SHIFT		8
+#define CAN_FMR_CAN2SB_MASK		(0x3F << CAN_FMR_CAN2SB_SHIFT)
 
 /* 7:1 Reserved, forced to reset value */
 
@@ -649,18 +649,18 @@ int can_init(uint32_t canport, bool ttcm, bool abom, bool awum, bool nart,
 	     bool rflm, bool txfp, uint32_t sjw, uint32_t ts1, uint32_t ts2,
 	     uint32_t brp, bool loopback, bool silent);
 
-void can_filter_init(uint32_t canport, uint32_t nr, bool scale_32bit,
+void can_filter_init(uint32_t nr, bool scale_32bit,
 		     bool id_list_mode, uint32_t fr1, uint32_t fr2,
 		     uint32_t fifo, bool enable);
-void can_filter_id_mask_16bit_init(uint32_t canport, uint32_t nr, uint16_t id1,
+void can_filter_id_mask_16bit_init(uint32_t nr, uint16_t id1,
 				   uint16_t mask1, uint16_t id2,
 				   uint16_t mask2, uint32_t fifo, bool enable);
-void can_filter_id_mask_32bit_init(uint32_t canport, uint32_t nr, uint32_t id,
+void can_filter_id_mask_32bit_init(uint32_t nr, uint32_t id,
 				   uint32_t mask, uint32_t fifo, bool enable);
-void can_filter_id_list_16bit_init(uint32_t canport, uint32_t nr, uint16_t id1,
+void can_filter_id_list_16bit_init(uint32_t nr, uint16_t id1,
 				   uint16_t id2, uint16_t id3, uint16_t id4,
 				   uint32_t fifo, bool enable);
-void can_filter_id_list_32bit_init(uint32_t canport, uint32_t nr, uint32_t id1,
+void can_filter_id_list_32bit_init(uint32_t nr, uint32_t id1,
 				   uint32_t id2, uint32_t fifo, bool enable);
 
 void can_enable_irq(uint32_t canport, uint32_t irq);
@@ -669,11 +669,12 @@ void can_disable_irq(uint32_t canport, uint32_t irq);
 int can_transmit(uint32_t canport, uint32_t id, bool ext, bool rtr,
 		 uint8_t length, uint8_t *data);
 void can_receive(uint32_t canport, uint8_t fifo, bool release, uint32_t *id,
-		 bool *ext, bool *rtr, uint32_t *fmi, uint8_t *length,
-		 uint8_t *data);
+		 bool *ext, bool *rtr, uint8_t *fmi, uint8_t *length,
+		 uint8_t *data, uint16_t *timestamp);
 
 void can_fifo_release(uint32_t canport, uint8_t fifo);
 bool can_available_mailbox(uint32_t canport);
 END_DECLS
 
+/**@}*/
 #endif

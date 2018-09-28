@@ -96,7 +96,13 @@ LGPL License Terms @ref lgpl_license
 
 /* --- ADC_SR values ------------------------------------------------------- */
 
+/** @defgroup adc_sr_values ADC Status Register Flags
+ * @ingroup adc_defines
+ *@{*/
+
+/* OVR:*//** Overrun */
 #define ADC_SR_OVR			(1 << 5)
+/**@}*/
 
 /* --- ADC_CR1 values specific to STM32F2,4--------------------------------- */
 
@@ -266,14 +272,14 @@ LGPL License Terms @ref lgpl_license
 #define ADC_SMPR1_SMP12_LSB		6
 #define ADC_SMPR1_SMP11_LSB		3
 #define ADC_SMPR1_SMP10_LSB		0
-#define ADC_SMPR1_SMP17_MSK		(0x7 << ADC_SMP17_LSB)
-#define ADC_SMPR1_SMP16_MSK		(0x7 << ADC_SMP16_LSB)
-#define ADC_SMPR1_SMP15_MSK		(0x7 << ADC_SMP15_LSB)
-#define ADC_SMPR1_SMP14_MSK		(0x7 << ADC_SMP14_LSB)
-#define ADC_SMPR1_SMP13_MSK		(0x7 << ADC_SMP13_LSB)
-#define ADC_SMPR1_SMP12_MSK		(0x7 << ADC_SMP12_LSB)
-#define ADC_SMPR1_SMP11_MSK		(0x7 << ADC_SMP11_LSB)
-#define ADC_SMPR1_SMP10_MSK		(0x7 << ADC_SMP10_LSB)
+#define ADC_SMPR1_SMP17_MSK		(0x7 << ADC_SMPR1_SMP17_LSB)
+#define ADC_SMPR1_SMP16_MSK		(0x7 << ADC_SMPR1_SMP16_LSB)
+#define ADC_SMPR1_SMP15_MSK		(0x7 << ADC_SMPR1_SMP15_LSB)
+#define ADC_SMPR1_SMP14_MSK		(0x7 << ADC_SMPR1_SMP14_LSB)
+#define ADC_SMPR1_SMP13_MSK		(0x7 << ADC_SMPR1_SMP13_LSB)
+#define ADC_SMPR1_SMP12_MSK		(0x7 << ADC_SMPR1_SMP12_LSB)
+#define ADC_SMPR1_SMP11_MSK		(0x7 << ADC_SMPR1_SMP11_LSB)
+#define ADC_SMPR1_SMP10_MSK		(0x7 << ADC_SMPR1_SMP10_LSB)
 
 /* --- ADC_SMPR2 values ---------------------------------------------------- */
 
@@ -287,16 +293,16 @@ LGPL License Terms @ref lgpl_license
 #define ADC_SMPR2_SMP2_LSB		6
 #define ADC_SMPR2_SMP1_LSB		3
 #define ADC_SMPR2_SMP0_LSB		0
-#define ADC_SMPR2_SMP9_MSK		(0x7 << ADC_SMP9_LSB)
-#define ADC_SMPR2_SMP8_MSK		(0x7 << ADC_SMP8_LSB)
-#define ADC_SMPR2_SMP7_MSK		(0x7 << ADC_SMP7_LSB)
-#define ADC_SMPR2_SMP6_MSK		(0x7 << ADC_SMP6_LSB)
-#define ADC_SMPR2_SMP5_MSK		(0x7 << ADC_SMP5_LSB)
-#define ADC_SMPR2_SMP4_MSK		(0x7 << ADC_SMP4_LSB)
-#define ADC_SMPR2_SMP3_MSK		(0x7 << ADC_SMP3_LSB)
-#define ADC_SMPR2_SMP2_MSK		(0x7 << ADC_SMP2_LSB)
-#define ADC_SMPR2_SMP1_MSK		(0x7 << ADC_SMP1_LSB)
-#define ADC_SMPR2_SMP0_MSK		(0x7 << ADC_SMP0_LSB)
+#define ADC_SMPR2_SMP9_MSK		(0x7 << ADC_SMPR2_SMP9_LSB)
+#define ADC_SMPR2_SMP8_MSK		(0x7 << ADC_SMPR2_SMP8_LSB)
+#define ADC_SMPR2_SMP7_MSK		(0x7 << ADC_SMPR2_SMP7_LSB)
+#define ADC_SMPR2_SMP6_MSK		(0x7 << ADC_SMPR2_SMP6_LSB)
+#define ADC_SMPR2_SMP5_MSK		(0x7 << ADC_SMPR2_SMP5_LSB)
+#define ADC_SMPR2_SMP4_MSK		(0x7 << ADC_SMPR2_SMP4_LSB)
+#define ADC_SMPR2_SMP3_MSK		(0x7 << ADC_SMPR2_SMP3_LSB)
+#define ADC_SMPR2_SMP2_MSK		(0x7 << ADC_SMPR2_SMP2_LSB)
+#define ADC_SMPR2_SMP1_MSK		(0x7 << ADC_SMPR2_SMP1_LSB)
+#define ADC_SMPR2_SMP0_MSK		(0x7 << ADC_SMPR2_SMP0_LSB)
 
 /* --- ADC_SMPRx values --------------------------------------------------- */
 /****************************************************************************/
@@ -579,9 +585,10 @@ void adc_eoc_after_each(uint32_t adc);
 void adc_eoc_after_group(uint32_t adc);
 void adc_set_dma_continue(uint32_t adc);
 void adc_set_dma_terminate(uint32_t adc);
-
 void adc_enable_temperature_sensor(void);
 void adc_disable_temperature_sensor(void);
+void adc_enable_vbat_sensor(void);
+void adc_disable_vbat_sensor(void);
 
 END_DECLS
 

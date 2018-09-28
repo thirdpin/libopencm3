@@ -57,14 +57,14 @@ const struct rcc_clock_scale rcc_hse_8mhz_3v3[RCC_CLOCK_3V3_END] = {
 		.hpre = RCC_CFGR_HPRE_DIV_NONE,
 		.ppre1 = RCC_CFGR_PPRE_DIV_4,
 		.ppre2 = RCC_CFGR_PPRE_DIV_2,
-		.flash_config = FLASH_ACR_ICE | FLASH_ACR_DCE |
+		.flash_config = FLASH_ACR_DCEN | FLASH_ACR_ICEN |
 				FLASH_ACR_LATENCY_3WS,
 		.apb1_frequency = 30000000,
 		.apb2_frequency = 60000000,
 	},
 };
 
-void rcc_osc_ready_int_clear(osc_t osc)
+void rcc_osc_ready_int_clear(enum rcc_osc osc)
 {
 	switch (osc) {
 	case RCC_PLL:
@@ -85,7 +85,7 @@ void rcc_osc_ready_int_clear(osc_t osc)
 	}
 }
 
-void rcc_osc_ready_int_enable(osc_t osc)
+void rcc_osc_ready_int_enable(enum rcc_osc osc)
 {
 	switch (osc) {
 	case RCC_PLL:
@@ -106,7 +106,7 @@ void rcc_osc_ready_int_enable(osc_t osc)
 	}
 }
 
-void rcc_osc_ready_int_disable(osc_t osc)
+void rcc_osc_ready_int_disable(enum rcc_osc osc)
 {
 	switch (osc) {
 	case RCC_PLL:
@@ -127,7 +127,7 @@ void rcc_osc_ready_int_disable(osc_t osc)
 	}
 }
 
-int rcc_osc_ready_int_flag(osc_t osc)
+int rcc_osc_ready_int_flag(enum rcc_osc osc)
 {
 	switch (osc) {
 	case RCC_PLL:
@@ -160,38 +160,42 @@ int rcc_css_int_flag(void)
 	return ((RCC_CIR & RCC_CIR_CSSF) != 0);
 }
 
-void rcc_wait_for_osc_ready(osc_t osc)
+bool rcc_is_osc_ready(enum rcc_osc osc)
 {
 	switch (osc) {
 	case RCC_PLL:
-		while ((RCC_CR & RCC_CR_PLLRDY) == 0);
-		break;
+		return RCC_CR & RCC_CR_PLLRDY;
 	case RCC_HSE:
-		while ((RCC_CR & RCC_CR_HSERDY) == 0);
-		break;
+		return RCC_CR & RCC_CR_HSERDY;
 	case RCC_HSI:
-		while ((RCC_CR & RCC_CR_HSIRDY) == 0);
-		break;
+		return RCC_CR & RCC_CR_HSIRDY;
 	case RCC_LSE:
-		while ((RCC_BDCR & RCC_BDCR_LSERDY) == 0);
-		break;
+		return RCC_BDCR & RCC_BDCR_LSERDY;
 	case RCC_LSI:
-		while ((RCC_CSR & RCC_CSR_LSIRDY) == 0);
-		break;
+		return RCC_CSR & RCC_CSR_LSIRDY;
 	}
+	return false;
 }
 
-void rcc_wait_for_sysclk_status(osc_t osc)
+void rcc_wait_for_osc_ready(enum rcc_osc osc)
+{
+	while (!rcc_is_osc_ready(osc));
+}
+
+void rcc_wait_for_sysclk_status(enum rcc_osc osc)
 {
 	switch (osc) {
 	case RCC_PLL:
-		while ((RCC_CFGR & ((1 << 1) | (1 << 0))) != RCC_CFGR_SWS_PLL);
+		while (((RCC_CFGR >> RCC_CFGR_SWS_SHIFT) & RCC_CFGR_SWS_MASK) !=
+			RCC_CFGR_SWS_PLL);
 		break;
 	case RCC_HSE:
-		while ((RCC_CFGR & ((1 << 1) | (1 << 0))) != RCC_CFGR_SWS_HSE);
+		while (((RCC_CFGR >> RCC_CFGR_SWS_SHIFT) & RCC_CFGR_SWS_MASK) !=
+			RCC_CFGR_SWS_HSE);
 		break;
 	case RCC_HSI:
-		while ((RCC_CFGR & ((1 << 1) | (1 << 0))) != RCC_CFGR_SWS_HSI);
+		while (((RCC_CFGR >> RCC_CFGR_SWS_SHIFT) & RCC_CFGR_SWS_MASK) !=
+			RCC_CFGR_SWS_HSI);
 		break;
 	default:
 		/* Shouldn't be reached. */
@@ -199,7 +203,7 @@ void rcc_wait_for_sysclk_status(osc_t osc)
 	}
 }
 
-void rcc_osc_on(osc_t osc)
+void rcc_osc_on(enum rcc_osc osc)
 {
 	switch (osc) {
 	case RCC_PLL:
@@ -220,7 +224,7 @@ void rcc_osc_on(osc_t osc)
 	}
 }
 
-void rcc_osc_off(osc_t osc)
+void rcc_osc_off(enum rcc_osc osc)
 {
 	switch (osc) {
 	case RCC_PLL:
@@ -249,40 +253,6 @@ void rcc_css_enable(void)
 void rcc_css_disable(void)
 {
 	RCC_CR &= ~RCC_CR_CSSON;
-}
-
-void rcc_osc_bypass_enable(osc_t osc)
-{
-	switch (osc) {
-	case RCC_HSE:
-		RCC_CR |= RCC_CR_HSEBYP;
-		break;
-	case RCC_LSE:
-		RCC_BDCR |= RCC_BDCR_LSEBYP;
-		break;
-	case RCC_PLL:
-	case RCC_HSI:
-	case RCC_LSI:
-		/* Do nothing, only HSE/LSE allowed here. */
-		break;
-	}
-}
-
-void rcc_osc_bypass_disable(osc_t osc)
-{
-	switch (osc) {
-	case RCC_HSE:
-		RCC_CR &= ~RCC_CR_HSEBYP;
-		break;
-	case RCC_LSE:
-		RCC_BDCR &= ~RCC_BDCR_LSEBYP;
-		break;
-	case RCC_PLL:
-	case RCC_HSI:
-	case RCC_LSI:
-		/* Do nothing, only HSE/LSE allowed here. */
-		break;
-	}
 }
 
 void rcc_set_sysclk_source(uint32_t clk)

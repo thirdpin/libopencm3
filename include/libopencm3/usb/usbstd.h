@@ -68,6 +68,7 @@ struct usb_setup_data {
 /* bit 7 : direction */
 #define USB_REQ_TYPE_DIRECTION			0x80
 #define USB_REQ_TYPE_IN				0x80
+#define USB_REQ_TYPE_OUT			0x0
 /* bits 6..5 : type */
 #define USB_REQ_TYPE_TYPE			0x60
 #define USB_REQ_TYPE_STANDARD			0x00
@@ -153,6 +154,16 @@ struct usb_device_qualifier_descriptor {
 	uint8_t bReserved;
 } __attribute__((packed));
 
+/* This is only defined as a top level named struct to improve c++
+ * compatibility.  You should never need to instance this struct
+ * in user code! */
+struct usb_interface {
+	uint8_t *cur_altsetting;
+	uint8_t num_altsetting;
+	const struct usb_iface_assoc_descriptor *iface_assoc;
+	const struct usb_interface_descriptor *altsetting;
+};
+
 /* USB Standard Configuration Descriptor - Table 9-10 */
 struct usb_config_descriptor {
 	uint8_t bLength;
@@ -165,12 +176,7 @@ struct usb_config_descriptor {
 	uint8_t bMaxPower;
 
 	/* Descriptor ends here.  The following are used internally: */
-	struct usb_interface {
-		uint8_t *cur_altsetting;
-		uint8_t num_altsetting;
-		struct usb_iface_assoc_descriptor *iface_assoc;
-		struct usb_interface_descriptor *altsetting;
-	} *interface;
+	const struct usb_interface *interface;
 } __attribute__((packed));
 #define USB_DT_CONFIGURATION_SIZE		9
 

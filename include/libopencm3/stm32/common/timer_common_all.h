@@ -863,8 +863,8 @@ depending on the level of the complementary input. */
 /* Note: CC2S bits are writable only when the channel is OFF (CC2E = 0 in
  * TIMx_CCER). */
 #define TIM_CCMR2_CC4S_OUT		(0x0 << 8)
-#define TIM_CCMR2_CC4S_IN_TI3		(0x1 << 8)
-#define TIM_CCMR2_CC4S_IN_TI4		(0x2 << 8)
+#define TIM_CCMR2_CC4S_IN_TI4		(0x1 << 8)
+#define TIM_CCMR2_CC4S_IN_TI3		(0x2 << 8)
 #define TIM_CCMR2_CC4S_IN_TRC		(0x3 << 8)
 #define TIM_CCMR2_CC4S_MASK		(0x3 << 8)
 
@@ -892,8 +892,8 @@ depending on the level of the complementary input. */
 /* Note: CC2S bits are writable only when the channel is OFF (CC2E = 0 in
  * TIMx_CCER). */
 #define TIM_CCMR2_CC3S_OUT		(0x0 << 0)
-#define TIM_CCMR2_CC3S_IN_TI4		(0x1 << 0)
-#define TIM_CCMR2_CC3S_IN_TI3		(0x2 << 0)
+#define TIM_CCMR2_CC3S_IN_TI3		(0x1 << 0)
+#define TIM_CCMR2_CC3S_IN_TI4		(0x2 << 0)
 #define TIM_CCMR2_CC3S_IN_TRC		(0x3 << 0)
 #define TIM_CCMR2_CC3S_MASK		(0x3 << 0)
 
@@ -952,6 +952,9 @@ depending on the level of the complementary input. */
 #define TIM_CCMR2_IC3PSC_MASK		(0x3 << 2)
 
 /* --- TIMx_CCER values ---------------------------------------------------- */
+
+/* CC4NP: Capture/compare 4 complementary output polarity */
+#define TIM_CCER_CC4NP			(1 << 15)
 
 /* CC4P: Capture/compare 4 output polarity */
 #define TIM_CCER_CC4P			(1 << 13)
@@ -1167,7 +1170,6 @@ enum tim_et_pol {
 
 BEGIN_DECLS
 
-void timer_reset(uint32_t timer_peripheral);
 void timer_enable_irq(uint32_t timer_peripheral, uint32_t irq);
 void timer_disable_irq(uint32_t timer_peripheral, uint32_t irq);
 bool timer_interrupt_source(uint32_t timer_peripheral, uint32_t flag);
@@ -1264,4 +1266,3 @@ END_DECLS
 #endif
 /** @endcond */
 /**@}*/
-

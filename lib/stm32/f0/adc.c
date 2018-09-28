@@ -1,8 +1,5 @@
-/** @defgroup adc_file ADC
- *
- * @ingroup STM32F0xx
- *
- * @brief <b>libopencm3 STM32F0xx Analog to Digital Converters</b>
+/** @addtogroup adc_file ADC peripheral API
+ * @ingroup peripheral_apis
  *
  * based on F3 file
  *
@@ -398,6 +395,7 @@ void adc_disable_vbat_sensor(void)
 
 /*---------------------------------------------------------------------------*/
 /** @brief ADC Start the calibration procedure
+ * @deprecated Replaced by adc_calibrate/_async/is_calibrating
  *
  * @param[in] adc Unsigned int32. ADC base address (@ref adc_reg_base)
  */
@@ -409,6 +407,7 @@ void adc_calibrate_start(uint32_t adc)
 
 /*---------------------------------------------------------------------------*/
 /** @brief ADC Wait to finish the ADC calibration procedure
+ * @deprecated Replaced by adc_calibrate/_async/is_calibrating
  *
  * @param[in] adc Unsigned int32. ADC base address (@ref adc_reg_base)
  */

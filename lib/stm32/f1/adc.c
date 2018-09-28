@@ -1,8 +1,5 @@
-/** @defgroup adc_file ADC
-
-@ingroup STM32F1xx
-
-@brief <b>libopencm3 STM32F1xx Analog to Digital Converters</b>
+/** @addtogroup adc_file ADC peripheral API
+@ingroup peripheral_apis
 
 @version 1.0.0
 
@@ -199,13 +196,11 @@ void adc_set_dual_mode(uint32_t mode)
 This enables both the sensor and the reference voltage measurements on channels
 16 and 17.
 
-@param[in] adc Unsigned int32. ADC block register address base @ref
-adc_reg_base.
 */
 
-void adc_enable_temperature_sensor(uint32_t adc)
+void adc_enable_temperature_sensor()
 {
-	ADC_CR2(adc) |= ADC_CR2_TSVREFE;
+	ADC_CR2(ADC1) |= ADC_CR2_TSVREFE;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -213,14 +208,11 @@ void adc_enable_temperature_sensor(uint32_t adc)
 
 Disabling this will reduce power consumption from the sensor and the reference
 voltage measurements.
-
-@param[in] adc Unsigned int32. ADC block register address base @ref
-adc_reg_base.
 */
 
-void adc_disable_temperature_sensor(uint32_t adc)
+void adc_disable_temperature_sensor()
 {
-	ADC_CR2(adc) &= ~ADC_CR2_TSVREFE;
+	ADC_CR2(ADC1) &= ~ADC_CR2_TSVREFE;
 }
 
 
@@ -349,7 +341,7 @@ void adc_reset_calibration(uint32_t adc)
 
 /*---------------------------------------------------------------------------*/
 /** @brief ADC Calibration
-
+@deprecated replaced by adc_calibrate/_async/_is_calibrating
 The calibration data for the ADC is recomputed. The hardware clears the
 calibration status flag when calibration is complete. This function does not
 return until this happens and the ADC is ready for use.
@@ -367,22 +359,37 @@ void adc_calibration(uint32_t adc)
 	while (ADC_CR2(adc) & ADC_CR2_CAL);
 }
 
-/*---------------------------------------------------------------------------*/
-/** @brief ADC Power On
-
-If the ADC is in power-down mode then it is powered up. The application needs
-to wait a time of about 3 microseconds for stabilization before using the ADC.
-If the ADC is already on this function call will initiate a conversion.
-
-@deprecated to be removed in a later release
-
-@param[in] adc Unsigned int32. ADC block register address base @ref
-adc_reg_base.
-*/
-
-void adc_on(uint32_t adc)
+/**
+ * Start the ADC calibration and immediately return.
+ * @sa adc_calibrate
+ * @sa adc_is_calibrate
+ * @param adc ADC Block register address base @ref adc_reg_base
+ */
+void adc_calibrate_async(uint32_t adc)
 {
-	ADC_CR2(adc) |= ADC_CR2_ADON;
+	ADC_CR2(adc) |= ADC_CR2_CAL;
+}
+
+/**
+ * Is the ADC Calibrating?
+ * @param adc ADC Block register address base @ref adc_reg_base
+ * @return true if the adc is currently calibrating
+ */
+bool adc_is_calibrating(uint32_t adc)
+{
+	return (ADC_CR2(adc) & ADC_CR2_CAL);
+}
+
+/**
+ * Start ADC calibration and wait for it to finish.
+ * The ADC must have been powered down for at least 2 ADC clock cycles, then
+ * powered on before calibration starts
+ * @param adc ADC Block register address base @ref adc_reg_base
+ */
+void adc_calibrate(uint32_t adc)
+{
+	adc_calibrate_async(adc);
+	while (adc_is_calibrating(adc));
 }
 
 

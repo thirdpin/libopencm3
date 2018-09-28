@@ -31,10 +31,10 @@ specific memorymap.h header before including this header file.*/
 
 /*
  * The adc v2 peripheral optionally supports per channel sampling, injected
- * sequences, watchdogs, offsets and other "advanced" features, and is 
+ * sequences, watchdogs, offsets and other "advanced" features, and is
  * found on the (so far) F3 and L4,
  * or only a much "simpler" version as found on (so far) f0 and l0.
- */ 
+ */
 
 /** @cond */
 #ifdef LIBOPENCM3_ADC_H
@@ -43,12 +43,16 @@ specific memorymap.h header before including this header file.*/
 #define LIBOPENCM3_ADC_COMMON_V2_SINGLE_H
 
 /* ----- ADC registers  -----------------------------------------------------*/
-/* Channel Select Register */
+/** Channel Select Register */
 #define ADC_CHSELR(adc)		MMIO32((adc) + 0x28)
 
 /* ----- ADC registers values -----------------------------------------------*/
 /* ADC_CFGR1 values */
+/** Wait conversion mode */
 #define ADC_CFGR1_WAIT		(1<<14)
+/** Auto off mode */
+#define ADC_CFGR1_AUTOFF		(1 << 15)
+
 /* EXTSEL[2:0]: External trigger selection for regular group */
 #define ADC_CFGR1_EXTSEL_SHIFT		6
 #define ADC_CFGR1_EXTSEL		(0x7 << ADC_CFGR1_EXTSEL_SHIFT)
@@ -68,5 +72,7 @@ BEGIN_DECLS
 END_DECLS
 
 #endif
-#endif	/* LIBOPENCM3_ADC_H */
+/** @cond */
+#endif
+/** @endcond */
 /**@}*/

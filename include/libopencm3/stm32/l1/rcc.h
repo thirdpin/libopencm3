@@ -89,8 +89,10 @@
 #define RCC_CR_RTCPRE_SHIFT	29
 #define RCC_CR_RTCPRE_MASK	0x3
 
-/* --- RCC_ICSCR values ---------------------------------------------------- */
-
+/** @defgroup rcc_icscr_defines RCC_ICSCR definitions
+ * @brief Internal clock sources calibration register
+ * @ingroup rcc_defines
+ *@{*/
 #define RCC_ICSCR_MSITRIM_SHIFT		24
 #define RCC_ICSCR_MSITRIM_MASK		0xff
 #define RCC_ICSCR_MSICAL_SHIFT		16
@@ -98,6 +100,9 @@
 
 #define RCC_ICSCR_MSIRANGE_SHIFT	13
 #define RCC_ICSCR_MSIRANGE_MASK		0x7
+/** @defgroup rcc_icscr_msirange MSI Ranges
+ * @ingroup rcc_icscr_defines
+ *@{*/
 #define RCC_ICSCR_MSIRANGE_65KHZ	0x0
 #define RCC_ICSCR_MSIRANGE_131KHZ	0x1
 #define RCC_ICSCR_MSIRANGE_262KHZ	0x2
@@ -105,32 +110,33 @@
 #define RCC_ICSCR_MSIRANGE_1MHZ		0x4
 #define RCC_ICSCR_MSIRANGE_2MHZ		0x5
 #define RCC_ICSCR_MSIRANGE_4MHZ		0x6
-
+/**@}*/
 #define RCC_ICSCR_HSITRIM_SHIFT		8
 #define RCC_ICSCR_HSITRIM_MASK		0x1f
 #define RCC_ICSCR_HSICAL_SHIFT		0
 #define RCC_ICSCR_HSICAL_MASK		0xff
+/**@}*/
 
 /* --- RCC_CFGR values ----------------------------------------------------- */
 
 /* MCOPRE */
-#define RCC_CFGR_MCOPRE_DIV1	    0
-#define RCC_CFGR_MCOPRE_DIV2	    1
-#define RCC_CFGR_MCOPRE_DIV4	    2
-#define RCC_CFGR_MCOPRE_DIV8	    3
-#define RCC_CFGR_MCOPRE_DIV16	    4
-#define RCC_CFGR_MCOPRE_SHIFT       28
-#define RCC_CFGR_MCOPRE             (0x7 << RCC_CFGR_MCOPRE_SHIFT)
+#define RCC_CFGR_MCOPRE_DIV1	0
+#define RCC_CFGR_MCOPRE_DIV2	1
+#define RCC_CFGR_MCOPRE_DIV4	2
+#define RCC_CFGR_MCOPRE_DIV8	3
+#define RCC_CFGR_MCOPRE_DIV16	4
+#define RCC_CFGR_MCOPRE_SHIFT	28
+#define RCC_CFGR_MCOPRE_MASK	0x7
 
 /* MCO: Microcontroller clock output */
 #define RCC_CFGR_MCO_NOCLK			0x0
 #define RCC_CFGR_MCO_SYSCLK			0x1
-#define RCC_CFGR_MCO_HSICLK			0x2
-#define RCC_CFGR_MCO_MSICLK			0x3
-#define RCC_CFGR_MCO_HSECLK			0x4
-#define RCC_CFGR_MCO_PLLCLK			0x5
-#define RCC_CFGR_MCO_LSICLK			0x6
-#define RCC_CFGR_MCO_LSECLK			0x7
+#define RCC_CFGR_MCO_HSI			0x2
+#define RCC_CFGR_MCO_MSI			0x3
+#define RCC_CFGR_MCO_HSE			0x4
+#define RCC_CFGR_MCO_PLL			0x5
+#define RCC_CFGR_MCO_LSI			0x6
+#define RCC_CFGR_MCO_LSE			0x7
 #define RCC_CFGR_MCO_SHIFT			24
 #define RCC_CFGR_MCO_MASK			0x7
 
@@ -164,6 +170,8 @@
 #define RCC_CFGR_PPRE2_HCLK_DIV4		0x5
 #define RCC_CFGR_PPRE2_HCLK_DIV8		0x6
 #define RCC_CFGR_PPRE2_HCLK_DIV16		0x7
+#define RCC_CFGR_PPRE2_MASK			0x7
+#define RCC_CFGR_PPRE2_SHIFT			11
 
 /* PPRE1: APB low-speed prescaler (APB1) */
 #define RCC_CFGR_PPRE1_HCLK_NODIV		0x0
@@ -171,6 +179,8 @@
 #define RCC_CFGR_PPRE1_HCLK_DIV4		0x5
 #define RCC_CFGR_PPRE1_HCLK_DIV8		0x6
 #define RCC_CFGR_PPRE1_HCLK_DIV16		0x7
+#define RCC_CFGR_PPRE1_MASK			0x7
+#define RCC_CFGR_PPRE1_SHIFT			8
 
 /* HPRE: AHB prescaler */
 #define RCC_CFGR_HPRE_SYSCLK_NODIV		0x0
@@ -182,18 +192,24 @@
 #define RCC_CFGR_HPRE_SYSCLK_DIV128		0xd
 #define RCC_CFGR_HPRE_SYSCLK_DIV256		0xe
 #define RCC_CFGR_HPRE_SYSCLK_DIV512		0xf
+#define RCC_CFGR_HPRE_MASK			0xf
+#define RCC_CFGR_HPRE_SHIFT			4
 
 /* SWS: System clock switch status */
 #define RCC_CFGR_SWS_SYSCLKSEL_MSICLK		0x0
 #define RCC_CFGR_SWS_SYSCLKSEL_HSICLK		0x1
 #define RCC_CFGR_SWS_SYSCLKSEL_HSECLK		0x2
 #define RCC_CFGR_SWS_SYSCLKSEL_PLLCLK		0x3
+#define RCC_CFGR_SWS_MASK			0x3
+#define RCC_CFGR_SWS_SHIFT			2
 
 /* SW: System clock switch */
 #define RCC_CFGR_SW_SYSCLKSEL_MSICLK		0x0
 #define RCC_CFGR_SW_SYSCLKSEL_HSICLK		0x1
 #define RCC_CFGR_SW_SYSCLKSEL_HSECLK		0x2
 #define RCC_CFGR_SW_SYSCLKSEL_PLLCLK		0x3
+#define RCC_CFGR_SW_MASK			0x3
+#define RCC_CFGR_SW_SHIFT			0
 
 /* --- RCC_CIR values ------------------------------------------------------ */
 
@@ -372,6 +388,9 @@
 #define RCC_CSR_PINRSTF				(1 << 26)
 #define RCC_CSR_OBLRSTF				(1 << 25)
 #define RCC_CSR_RMVF				(1 << 24)
+#define RCC_CSR_RESET_FLAGS	(RCC_CSR_LPWRRSTF | RCC_CSR_WWDGRSTF |\
+		RCC_CSR_IWDGRSTF | RCC_CSR_SFTRSTF | RCC_CSR_PORRSTF |\
+		RCC_CSR_PINRSTF | RCC_CSR_OBLRSTF)
 #define RCC_CSR_RTCRST				(1 << 23)
 #define RCC_CSR_RTCEN				(1 << 22)
 #define RCC_CSR_RTCSEL_SHIFT			(16)
@@ -392,7 +411,7 @@ struct rcc_clock_scale {
 	uint8_t pll_mul;
 	uint16_t pll_div;
 	uint8_t pll_source;
-	uint32_t flash_config;
+	uint8_t flash_waitstates;
 	uint8_t hpre;
 	uint8_t ppre1;
 	uint8_t ppre2;
@@ -587,14 +606,12 @@ void rcc_osc_ready_int_disable(enum rcc_osc osc);
 int rcc_osc_ready_int_flag(enum rcc_osc osc);
 void rcc_css_int_clear(void);
 int rcc_css_int_flag(void);
-void rcc_wait_for_osc_ready(enum rcc_osc osc);
 void rcc_wait_for_sysclk_status(enum rcc_osc osc);
 void rcc_osc_on(enum rcc_osc osc);
 void rcc_osc_off(enum rcc_osc osc);
 void rcc_css_enable(void);
 void rcc_css_disable(void);
-void rcc_osc_bypass_enable(enum rcc_osc osc);
-void rcc_osc_bypass_disable(enum rcc_osc osc);
+void rcc_set_msi_range(uint32_t range);
 void rcc_set_sysclk_source(uint32_t clk);
 void rcc_set_pll_configuration(uint32_t source, uint32_t multiplier,
 			       uint32_t divisor);

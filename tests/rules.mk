@@ -71,6 +71,7 @@ OPENCM3_INC = $(OPENCM3_DIR)/include
 INCLUDES += $(patsubst %,-I%, . $(OPENCM3_INC) )
 
 OBJS = $(CFILES:%.c=$(BUILD_DIR)/%.o)
+GENERATED_BINS = $(PROJECT).elf $(PROJECT).bin $(PROJECT).map $(PROJECT).list $(PROJECT).lss
 
 TGT_CPPFLAGS += -MD
 TGT_CPPFLAGS += -Wall -Wundef $(INCLUDES)
@@ -99,7 +100,10 @@ ifeq ($(V),99)
 TGT_LDFLAGS += -Wl,--print-gc-sections
 endif
 
+# Linker script generator fills this in for us.
+ifeq (,$(DEVICE))
 LDLIBS += -l$(OPENCM3_LIB)
+endif
 # nosys is only in newer gcc-arm-embedded...
 #LDLIBS += -specs=nosys.specs
 LDLIBS += -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
@@ -118,9 +122,12 @@ LDLIBS += -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
 all: $(PROJECT).elf $(PROJECT).bin
 flash: $(PROJECT).flash
 
+# error if not using linker script generator
+ifeq (,$(DEVICE))
 $(LDSCRIPT):
 ifeq (,$(wildcard $(LDSCRIPT)))
     $(error Unable to find specified linker script: $(LDSCRIPT))
+endif
 endif
 
 # Need a special rule to have a bin dir
@@ -134,7 +141,7 @@ $(BUILD_DIR)/%.o: %.cxx
 	@mkdir -p $(dir $@)
 	$(Q)$(CC) $(TGT_CXXFLAGS) $(CXXFLAGS) $(TGT_CPPFLAGS) $(CPPFLAGS) -o $@ -c $<
 
-$(PROJECT).elf: $(OBJS) $(LDSCRIPT)
+$(PROJECT).elf: $(OBJS) $(LDSCRIPT) $(LIBDEPS)
 	@printf "  LD\t$@\n"
 	$(Q)$(LD) $(TGT_LDFLAGS) $(LDFLAGS) $(OBJS) $(LDLIBS) -o $@
 
@@ -151,18 +158,20 @@ $(PROJECT).elf: $(OBJS) $(LDSCRIPT)
 %.flash: %.elf
 	@printf "  FLASH\t$<\n"
 ifeq (,$(OOCD_FILE))
-	$(Q)$(OOCD) -f interface/$(OOCD_INTERFACE).cfg \
+	$(Q)(echo "halt; program $(realpath $(*).elf) verify reset" | nc -4 localhost 4444 2>/dev/null) || \
+		$(OOCD) -f interface/$(OOCD_INTERFACE).cfg \
 		-f target/$(OOCD_TARGET).cfg \
-		-c "program $(*).elf verify reset exit" \
+		-c "program $(realpath $(*).elf) verify reset exit" \
 		$(NULL)
 else
-	$(Q)$(OOCD) -f $(OOCD_FILE) \
-		-c "program $(*).elf verify reset exit" \
+	$(Q)(echo "halt; program $(realpath $(*).elf) verify reset" | nc -4 localhost 4444 2>/dev/null) || \
+		$(Q)$(OOCD) -f $(OOCD_FILE) \
+		-c "program $(realpath $(*).elf) verify reset exit" \
 		$(NULL)
 endif
 
 clean:
-	rm -rf $(BUILD_DIR) $(PROJECT).{elf,bin} $(PROJECT).{list,lss,map}
+	rm -rf $(BUILD_DIR) $(GENERATED_BINS)
 
 .PHONY: all clean flash
 -include $(OBJS:.o=.d)

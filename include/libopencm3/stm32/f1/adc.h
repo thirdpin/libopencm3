@@ -289,14 +289,14 @@ and ADC2
 #define ADC_SMPR1_SMP12_LSB		6
 #define ADC_SMPR1_SMP11_LSB		3
 #define ADC_SMPR1_SMP10_LSB		0
-#define ADC_SMPR1_SMP17_MSK		(0x7 << ADC_SMP17_LSB)
-#define ADC_SMPR1_SMP16_MSK		(0x7 << ADC_SMP16_LSB)
-#define ADC_SMPR1_SMP15_MSK		(0x7 << ADC_SMP15_LSB)
-#define ADC_SMPR1_SMP14_MSK		(0x7 << ADC_SMP14_LSB)
-#define ADC_SMPR1_SMP13_MSK		(0x7 << ADC_SMP13_LSB)
-#define ADC_SMPR1_SMP12_MSK		(0x7 << ADC_SMP12_LSB)
-#define ADC_SMPR1_SMP11_MSK		(0x7 << ADC_SMP11_LSB)
-#define ADC_SMPR1_SMP10_MSK		(0x7 << ADC_SMP10_LSB)
+#define ADC_SMPR1_SMP17_MSK		(0x7 << ADC_SMPR1_SMP17_LSB)
+#define ADC_SMPR1_SMP16_MSK		(0x7 << ADC_SMPR1_SMP16_LSB)
+#define ADC_SMPR1_SMP15_MSK		(0x7 << ADC_SMPR1_SMP15_LSB)
+#define ADC_SMPR1_SMP14_MSK		(0x7 << ADC_SMPR1_SMP14_LSB)
+#define ADC_SMPR1_SMP13_MSK		(0x7 << ADC_SMPR1_SMP13_LSB)
+#define ADC_SMPR1_SMP12_MSK		(0x7 << ADC_SMPR1_SMP12_LSB)
+#define ADC_SMPR1_SMP11_MSK		(0x7 << ADC_SMPR1_SMP11_LSB)
+#define ADC_SMPR1_SMP10_MSK		(0x7 << ADC_SMPR1_SMP10_LSB)
 
 /* --- ADC_SMPR2 values ---------------------------------------------------- */
 
@@ -310,16 +310,16 @@ and ADC2
 #define ADC_SMPR2_SMP2_LSB		6
 #define ADC_SMPR2_SMP1_LSB		3
 #define ADC_SMPR2_SMP0_LSB		0
-#define ADC_SMPR2_SMP9_MSK		(0x7 << ADC_SMP9_LSB)
-#define ADC_SMPR2_SMP8_MSK		(0x7 << ADC_SMP8_LSB)
-#define ADC_SMPR2_SMP7_MSK		(0x7 << ADC_SMP7_LSB)
-#define ADC_SMPR2_SMP6_MSK		(0x7 << ADC_SMP6_LSB)
-#define ADC_SMPR2_SMP5_MSK		(0x7 << ADC_SMP5_LSB)
-#define ADC_SMPR2_SMP4_MSK		(0x7 << ADC_SMP4_LSB)
-#define ADC_SMPR2_SMP3_MSK		(0x7 << ADC_SMP3_LSB)
-#define ADC_SMPR2_SMP2_MSK		(0x7 << ADC_SMP2_LSB)
-#define ADC_SMPR2_SMP1_MSK		(0x7 << ADC_SMP1_LSB)
-#define ADC_SMPR2_SMP0_MSK		(0x7 << ADC_SMP0_LSB)
+#define ADC_SMPR2_SMP9_MSK		(0x7 << ADC_SMPR2_SMP9_LSB)
+#define ADC_SMPR2_SMP8_MSK		(0x7 << ADC_SMPR2_SMP8_LSB)
+#define ADC_SMPR2_SMP7_MSK		(0x7 << ADC_SMPR2_SMP7_LSB)
+#define ADC_SMPR2_SMP6_MSK		(0x7 << ADC_SMPR2_SMP6_LSB)
+#define ADC_SMPR2_SMP5_MSK		(0x7 << ADC_SMPR2_SMP5_LSB)
+#define ADC_SMPR2_SMP4_MSK		(0x7 << ADC_SMPR2_SMP4_LSB)
+#define ADC_SMPR2_SMP3_MSK		(0x7 << ADC_SMPR2_SMP3_LSB)
+#define ADC_SMPR2_SMP2_MSK		(0x7 << ADC_SMPR2_SMP2_LSB)
+#define ADC_SMPR2_SMP1_MSK		(0x7 << ADC_SMPR2_SMP1_LSB)
+#define ADC_SMPR2_SMP0_MSK		(0x7 << ADC_SMPR2_SMP0_LSB)
 
 /* --- ADC_SMPRx values --------------------------------------------------- */
 /****************************************************************************/
@@ -407,14 +407,16 @@ BEGIN_DECLS
 
 void adc_start_conversion_direct(uint32_t adc);
 void adc_set_dual_mode(uint32_t mode);
-void adc_enable_temperature_sensor(uint32_t adc);
-void adc_disable_temperature_sensor(uint32_t adc);
+void adc_enable_temperature_sensor(void);
+void adc_disable_temperature_sensor(void);
 void adc_enable_external_trigger_regular(uint32_t adc, uint32_t trigger);
 void adc_enable_external_trigger_injected(uint32_t adc, uint32_t trigger);
 void adc_reset_calibration(uint32_t adc);
-void adc_calibration(uint32_t adc);
-void adc_on(uint32_t adc)
-	LIBOPENCM3_DEPRECATED("will be removed in the first release");
+void adc_calibration(uint32_t adc)
+	LIBOPENCM3_DEPRECATED("see adc_calibrate/_async");
+void adc_calibrate_async(uint32_t adc);
+bool adc_is_calibrating(uint32_t adc);
+void adc_calibrate(uint32_t adc);
 
 END_DECLS
 

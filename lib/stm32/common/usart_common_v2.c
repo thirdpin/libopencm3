@@ -1,4 +1,5 @@
 /** @addtogroup usart_file
+@ingroup peripheral_apis
 
  @author @htmlonly &copy; @endhtmlonly 2016 Cem Basoglu <cem.basoglu@web.de>
 
@@ -30,8 +31,8 @@
 /*---------------------------------------------------------------------------*/
 /** @brief USART enable data inversion
 
- Logical data from the data register are send/received in negative/inverse logic.
- (1=L, 0=H). The parity bit is also inverted.
+ Logical data from the data register are send/received in negative/inverse
+ logic. (1=L, 0=H). The parity bit is also inverted.
 
  @note This bit field can only be written when the USART is disabled.
 
@@ -90,7 +91,7 @@ void usart_disable_tx_inversion(uint32_t usart)
 
  RX pin signal values are inverted. (VDD =0/mark, Gnd=1/idle).
 
- @This bit field can only be written when the USART is disabled.
+ This bit field can only be written when the USART is disabled.
 
  @param[in] usart USART block register address base @ref usart_reg_base
  */
@@ -104,7 +105,7 @@ void usart_enable_rx_inversion(uint32_t usart)
 
  RX pin signal works using the standard logic levels (VDD =1/idle, Gnd=0/mark)
 
- @This bit field can only be written when the USART is disabled.
+ This bit field can only be written when the USART is disabled.
 
  @param[in] usart USART block register address base @ref usart_reg_base
  */
@@ -127,7 +128,7 @@ void usart_disable_rx_inversion(uint32_t usart)
  Apart from this, the communication protocol is similar to normal USART mode.
  Any conflicts on the line must be managed by software
 
- @This bit field can only be written when the USART is disabled.
+ This bit field can only be written when the USART is disabled.
 
  @param[in] usart USART block register address base @ref usart_reg_base
  */
@@ -139,7 +140,7 @@ void usart_enable_halfduplex(uint32_t usart)
 /*---------------------------------------------------------------------------*/
 /** @brief USART Disable Half-duplex
 
- @This bit field can only be written when the USART is disabled.
+ This bit field can only be written when the USART is disabled.
 
  @param[in] usart USART block register address base @ref usart_reg_base
  */
@@ -224,5 +225,82 @@ void usart_disable_rx_timeout_interrupt(uint32_t usart)
 {
 	USART_CR1(usart) &= ~USART_CR1_RTOIE;
 }
+
+/*---------------------------------------------------------------------------*/
+/** @brief USART Send a Data Word.
+ *
+ * @param[in] usart unsigned 32 bit. USART block register address base @ref
+ * usart_reg_base
+ * @param[in] data unsigned 16 bit.
+ */
+
+void usart_send(uint32_t usart, uint16_t data)
+{
+	/* Send data. */
+	USART_TDR(usart) = (data & USART_TDR_MASK);
+}
+
+/*---------------------------------------------------------------------------*/
+/** @brief USART Read a Received Data Word.
+ *
+ * If parity is enabled the MSB (bit 7 or 8 depending on the word length) is
+ * the parity bit.
+ *
+ * @param[in] usart unsigned 32 bit. USART block register address base @ref
+ * usart_reg_base
+ * @returns unsigned 16 bit data word.
+ */
+
+uint16_t usart_recv(uint32_t usart)
+{
+	/* Receive data. */
+	return USART_RDR(usart) & USART_RDR_MASK;
+}
+
+/*---------------------------------------------------------------------------*/
+/** @brief USART Wait for Transmit Data Buffer Empty
+ *
+ * Blocks until the transmit data buffer becomes empty and is ready to accept
+ * the next data word.
+ *
+ * @param[in] usart unsigned 32 bit. USART block register address base @ref
+ * usart_reg_base
+ */
+
+void usart_wait_send_ready(uint32_t usart)
+{
+	/* Wait until the data has been transferred into the shift register. */
+	while ((USART_ISR(usart) & USART_ISR_TXE) == 0);
+}
+
+/*---------------------------------------------------------------------------*/
+/** @brief USART Wait for Received Data Available
+ *
+ * Blocks until the receive data buffer holds a valid received data word.
+ *
+ * @param[in] usart unsigned 32 bit. USART block register address base @ref
+ * usart_reg_base
+ */
+
+void usart_wait_recv_ready(uint32_t usart)
+{
+	/* Wait until the data is ready to be received. */
+	while ((USART_ISR(usart) & USART_ISR_RXNE) == 0);
+}
+
+/*---------------------------------------------------------------------------*/
+/** @brief USART Read a Status Flag.
+ *
+ * @param[in] usart unsigned 32 bit. USART block register address base @ref
+ * usart_reg_base
+ * @param[in] flag Unsigned int32. Status register flag  @ref usart_sr_flags.
+ * @returns boolean: flag set.
+ */
+
+bool usart_get_flag(uint32_t usart, uint32_t flag)
+{
+	return ((USART_ISR(usart) & flag) != 0);
+}
+
 
 /**@}*/

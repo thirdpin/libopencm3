@@ -37,7 +37,7 @@ specific memorymap.h header before including this header file.*/
 
 /*
  * The adc v2 peripheral optionally supports per channel sampling, injected
- * sequences, watchdogs, offsets and other "advanced" features, and is 
+ * sequences, watchdogs, offsets and other "advanced" features, and is
  * found on the (so far) F3 and L4,
  * or only a much "simpler" version as found on (so far) f0 and l0.
  */
@@ -83,7 +83,7 @@ specific memorymap.h header before including this header file.*/
 
 /* ADC common (shared) registers */
 #define ADC_CSR(adc)		MMIO32((adc) + 0x300 + 0x0)
-#define ADC_CDR(adc)		MMIO32((adc) + 0x300 + 0xa)
+#define ADC_CDR(adc)		MMIO32((adc) + 0x300 + 0xc)
 
 /* --- Register values ------------------------------------------------------*/
 /* ADC_ISR Values -----------------------------------------------------------*/
@@ -178,5 +178,7 @@ void adc_disable_regulator(uint32_t adc);
 END_DECLS
 
 #endif
-#endif	/* LIBOPENCM3_ADC_H */
+/** @cond */
+#endif
+/** @endcond */
 /**@}*/

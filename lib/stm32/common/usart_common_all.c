@@ -1,4 +1,5 @@
-/** @addtogroup usart_file
+/** @addtogroup usart_file USART peripheral API
+@ingroup peripheral_apis
 
 @author @htmlonly &copy; @endhtmlonly 2009 Uwe Hermann <uwe@hermann-uwe.de>
 
@@ -41,6 +42,9 @@ USART1/6) or the APB low-speed prescaler clock (for other USARTs). These values
 must be correctly set before calling this function (refer to the
 rcc_clock_setup-* functions in RCC).
 
+Note: For LPUART, baudrates over 2**24 (~16.7 Mbaud) may overflow
+the calculation and are therefore not supported by this function.
+
 @param[in] usart unsigned 32 bit. USART block register address base @ref
 usart_reg_base
 @param[in] baud unsigned 32 bit. Baud rate specified in Hz.
@@ -50,13 +54,12 @@ void usart_set_baudrate(uint32_t usart, uint32_t baud)
 {
 	uint32_t clock = rcc_apb1_frequency;
 
-#if defined STM32F2 || defined STM32F4
-	if ((usart == USART1) ||
-	    (usart == USART6)) {
-		clock = rcc_apb2_frequency;
-	}
-#else
-	if (usart == USART1) {
+#if defined USART1
+	if ((usart == USART1)
+#if defined USART6
+		|| (usart == USART6)
+#endif
+		) {
 		clock = rcc_apb2_frequency;
 	}
 #endif
@@ -70,7 +73,15 @@ void usart_set_baudrate(uint32_t usart, uint32_t baud)
 	 * Note: We round() the value rather than floor()ing it, for more
 	 * accurate divisor selection.
 	 */
-	USART_BRR(usart) = ((2 * clock) + baud) / (2 * baud);
+#ifdef LPUART1
+	if (usart == LPUART1) {
+		USART_BRR(usart) = (clock / baud) * 256
+			+ ((clock % baud) * 256 + baud / 2) / baud;
+		return;
+	}
+#endif
+
+	USART_BRR(usart) = (clock + baud / 2) / baud;
 }
 
 /*---------------------------------------------------------------------------*/

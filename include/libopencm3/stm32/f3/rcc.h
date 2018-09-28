@@ -51,6 +51,8 @@
 #ifndef LIBOPENCM3_RCC_H
 #define LIBOPENCM3_RCC_H
 
+#include <stdbool.h>
+
 /* --- RCC registers ------------------------------------------------------- */
 
 #define RCC_CR					MMIO32(RCC_BASE + 0x00)
@@ -90,7 +92,7 @@
 /* MCO: Microcontroller clock output */
 #define RCC_CFGR_MCO_SHIFT			24
 #define RCC_CFGR_MCO_MASK			0x7
-#define RCC_CFGR_MCO_DISABLED			0x0
+#define RCC_CFGR_MCO_NOCLK			0x0
 /*Reserve RCC_CFGR_MCO				0x1*/
 #define RCC_CFGR_MCO_LSI			0x2
 #define RCC_CFGR_MCO_LSE			0x3
@@ -106,21 +108,21 @@
 /* PLLMUL: PLL multiplication factor */
 #define RCC_CFGR_PLLMUL_SHIFT			18
 #define RCC_CFGR_PLLMUL_MASK			0xF
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X2		0x0
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X3		0x1
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X4		0x2
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X5		0x3
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X6		0x4
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X7		0x5
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X8		0x6
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X9		0x7
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X10		0x8
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X11		0x9
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X12		0xA
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X13		0xB
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X14		0xC
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X15		0xD
-#define RCC_CFGR_PLLMUL_PLL_IN_CLK_X16		0xE
+#define RCC_CFGR_PLLMUL_MUL2		0x0
+#define RCC_CFGR_PLLMUL_MUL3		0x1
+#define RCC_CFGR_PLLMUL_MUL4		0x2
+#define RCC_CFGR_PLLMUL_MUL5		0x3
+#define RCC_CFGR_PLLMUL_MUL6		0x4
+#define RCC_CFGR_PLLMUL_MUL7		0x5
+#define RCC_CFGR_PLLMUL_MUL8		0x6
+#define RCC_CFGR_PLLMUL_MUL9		0x7
+#define RCC_CFGR_PLLMUL_MUL10		0x8
+#define RCC_CFGR_PLLMUL_MUL11		0x9
+#define RCC_CFGR_PLLMUL_MUL12		0xA
+#define RCC_CFGR_PLLMUL_MUL13		0xB
+#define RCC_CFGR_PLLMUL_MUL14		0xC
+#define RCC_CFGR_PLLMUL_MUL15		0xD
+#define RCC_CFGR_PLLMUL_MUL16		0xE
 
 /* PPRE2: APB high-speed prescaler (APB2) */
 #define RCC_CFGR_PPRE2_SHIFT			11
@@ -159,6 +161,7 @@
 
 /* SWS: System clock switch status */
 #define RCC_CFGR_SWS_SHIFT			2
+#define RCC_CFGR_SWS_MASK			0x3
 #define RCC_CFGR_SWS_HSI			0x0
 #define RCC_CFGR_SWS_HSE			0x1
 #define RCC_CFGR_SWS_PLL			0x2
@@ -217,7 +220,7 @@
 #define RCC_APB1RSTR_DAC1RST			(1 << 29)
 #define RCC_APB1RSTR_PWRRST			(1 << 28)
 #define RCC_APB1RSTR_DAC2RST			(1 << 26)
-#define RCC_APB1RSTR_CANRST			(1 << 25)
+#define RCC_APB1RSTR_CAN1RST			(1 << 25)
 #define RCC_APB1RSTR_USBRST			(1 << 23)
 #define RCC_APB1RSTR_I2C2RST			(1 << 22)
 #define RCC_APB1RSTR_I2C1RST			(1 << 21)
@@ -410,17 +413,23 @@ extern uint32_t rcc_apb2_frequency;
 
 /* --- Function prototypes ------------------------------------------------- */
 
-enum rcc_clock {
-	RCC_CLOCK_44MHZ,
-	RCC_CLOCK_48MHZ,
-	RCC_CLOCK_64MHZ,
-	RCC_CLOCK_END
+enum rcc_clock_hsi {
+	RCC_CLOCK_HSI_48MHZ,
+	RCC_CLOCK_HSI_64MHZ, /* Max from HSI */
+	RCC_CLOCK_HSI_END
+};
+enum rcc_clock_hse8 {
+	RCC_CLOCK_HSE8_72MHZ,
+	RCC_CLOCK_HSE8_END
 };
 
+
 struct rcc_clock_scale {
-	uint8_t pll;
 	uint8_t pllsrc;
-	uint32_t flash_config;
+	uint8_t pllmul;
+	uint8_t plldiv;
+	bool usbdiv1;
+	uint32_t flash_waitstates;
 	uint8_t hpre;
 	uint8_t ppre1;
 	uint8_t ppre2;
@@ -430,7 +439,8 @@ struct rcc_clock_scale {
 	uint32_t apb2_frequency;
 };
 
-extern const struct rcc_clock_scale rcc_hsi_8mhz[RCC_CLOCK_END];
+extern const struct rcc_clock_scale rcc_hsi_configs[RCC_CLOCK_HSI_END];
+extern const struct rcc_clock_scale rcc_hse8mhz_configs[RCC_CLOCK_HSE8_END];
 
 enum rcc_osc {
 	RCC_PLL, RCC_HSE, RCC_HSI, RCC_LSE, RCC_LSI
@@ -481,6 +491,7 @@ enum rcc_periph_clken {
 	RCC_SDADC1	= _REG_BIT(0x18, 24),/*--78*/
 	RCC_SDADC2	= _REG_BIT(0x18, 25),/*--78*/
 	RCC_SDADC3	= _REG_BIT(0x18, 26),/*--78*/
+	RCC_HRTIM	= _REG_BIT(0x18, 29),
 
 	/* APB1 peripherals */
 	RCC_TIM2	= _REG_BIT(0x1C, 0),/*0178*/
@@ -504,6 +515,7 @@ enum rcc_periph_clken {
 	RCC_I2C2	= _REG_BIT(0x1C, 22),/*0178*/
 	RCC_USB		= _REG_BIT(0x1C, 23),/*0178*/
 	RCC_CAN		= _REG_BIT(0x1C, 25),/*0178*/
+	RCC_CAN1	= _REG_BIT(0x1C, 25),/*0178*/
 	RCC_DAC2	= _REG_BIT(0x1C, 26),
 	RCC_PWR		= _REG_BIT(0x1C, 28),/*0178*/
 	RCC_DAC1	= _REG_BIT(0x1C, 29),
@@ -528,6 +540,7 @@ enum rcc_periph_rst {
 	RST_SDADC1	= _REG_BIT(0x0C, 24),/*--78*/
 	RST_SDADC2	= _REG_BIT(0x0C, 25),/*--78*/
 	RST_SDADC3	= _REG_BIT(0x0C, 26),/*--78*/
+	RST_HRTIM	= _REG_BIT(0x0C, 29),
 
 	/* APB1 peripherals */
 	RST_TIM2	= _REG_BIT(0x10, 0),/*0178*/
@@ -551,6 +564,7 @@ enum rcc_periph_rst {
 	RST_I2C2	= _REG_BIT(0x10, 22),/*0178*/
 	RST_USB		= _REG_BIT(0x10, 23),/*0178*/
 	RST_CAN		= _REG_BIT(0x10, 25),/*0178*/
+	RST_CAN1	= _REG_BIT(0x10, 25),/*0178*/
 	RST_DAC2	= _REG_BIT(0x10, 26),
 	RST_PWR		= _REG_BIT(0x10, 28),/*0178*/
 	RST_DAC1	= _REG_BIT(0x10, 29),
@@ -587,15 +601,12 @@ void rcc_osc_ready_int_disable(enum rcc_osc osc);
 int rcc_osc_ready_int_flag(enum rcc_osc osc);
 void rcc_css_int_clear(void);
 int rcc_css_int_flag(void);
-void rcc_wait_for_osc_ready(enum rcc_osc osc);
 void rcc_wait_for_osc_not_ready(enum rcc_osc osc);
 void rcc_wait_for_sysclk_status(enum rcc_osc osc);
 void rcc_osc_on(enum rcc_osc osc);
 void rcc_osc_off(enum rcc_osc osc);
 void rcc_css_enable(void);
 void rcc_css_disable(void);
-void rcc_osc_bypass_enable(enum rcc_osc osc);
-void rcc_osc_bypass_disable(enum rcc_osc osc);
 void rcc_set_sysclk_source(uint32_t clk);
 void rcc_set_pll_source(uint32_t pllsrc);
 void rcc_set_ppre2(uint32_t ppre2);
@@ -605,6 +616,7 @@ void rcc_set_prediv(uint32_t prediv);
 void rcc_set_pll_multiplier(uint32_t pll);
 uint32_t rcc_get_system_clock_source(void);
 void rcc_backupdomain_reset(void);
+void rcc_clock_setup_pll(const struct rcc_clock_scale *clock);
 void rcc_clock_setup_hsi(const struct rcc_clock_scale *clock);
 void rcc_set_i2c_clock_hsi(uint32_t i2c);
 void rcc_set_i2c_clock_sysclk(uint32_t i2c);

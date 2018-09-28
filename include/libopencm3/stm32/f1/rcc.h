@@ -113,11 +113,11 @@
 #define RCC_CFGR_MCO_MASK			0xf
 #define RCC_CFGR_MCO_NOCLK			0x0
 #define RCC_CFGR_MCO_SYSCLK			0x4
-#define RCC_CFGR_MCO_HSICLK			0x5
-#define RCC_CFGR_MCO_HSECLK			0x6
-#define RCC_CFGR_MCO_PLLCLK_DIV2		0x7
-#define RCC_CFGR_MCO_PLL2CLK			0x8 /* (**) */
-#define RCC_CFGR_MCO_PLL3CLK_DIV2		0x9 /* (**) */
+#define RCC_CFGR_MCO_HSI			0x5
+#define RCC_CFGR_MCO_HSE			0x6
+#define RCC_CFGR_MCO_PLL_DIV2			0x7
+#define RCC_CFGR_MCO_PLL2			0x8 /* (**) */
+#define RCC_CFGR_MCO_PLL3_DIV2			0x9 /* (**) */
 #define RCC_CFGR_MCO_XT1			0xa /* (**) */
 #define RCC_CFGR_MCO_PLL3			0xb /* (**) */
 /**@}*/
@@ -364,8 +364,8 @@
 @ingroup STM32F1xx_rcc_defines
 
 @{*/
-#define RCC_APB2ENR_TIM17EN			(1 << 17)
-#define RCC_APB2ENR_TIM16EN			(1 << 16)
+#define RCC_APB2ENR_TIM17EN			(1 << 18)
+#define RCC_APB2ENR_TIM16EN			(1 << 17)
 #define RCC_APB2ENR_TIM15EN			(1 << 16)
 #define RCC_APB2ENR_ADC3EN			(1 << 15) /* (XX) */
 #define RCC_APB2ENR_USART1EN			(1 << 14)
@@ -433,6 +433,9 @@
 #define RCC_CSR_PORRSTF				(1 << 27)
 #define RCC_CSR_PINRSTF				(1 << 26)
 #define RCC_CSR_RMVF				(1 << 24)
+#define RCC_CSR_RESET_FLAGS	(RCC_CSR_LPWRRSTF | RCC_CSR_WWDGRSTF |\
+		RCC_CSR_IWDGRSTF | RCC_CSR_SFTRSTF | RCC_CSR_PORRSTF |\
+		RCC_CSR_PINRSTF)
 #define RCC_CSR_LSIRDY				(1 << 1)
 #define RCC_CSR_LSION				(1 << 0)
 
@@ -665,9 +668,9 @@ enum rcc_periph_rst {
 	RST_I2C1	= _REG_BIT(0x10, 21),/*VNC*/
 	RST_I2C2	= _REG_BIT(0x10, 22),/*VNC*/
 	RST_USB		= _REG_BIT(0x10, 23),/*-N-*/
-	RST_CAN		= _REG_BIT(0x10, 24),/*-N-*/
-	RST_CAN1	= _REG_BIT(0x10, 24),/*--C*/
-	RST_CAN2	= _REG_BIT(0x10, 25),/*--C*/
+	RST_CAN		= _REG_BIT(0x10, 25),/*-N-*/
+	RST_CAN1	= _REG_BIT(0x10, 25),/*--C*/
+	RST_CAN2	= _REG_BIT(0x10, 26),/*--C*/
 	RST_BKP		= _REG_BIT(0x10, 27),/*VNC*/
 	RST_PWR		= _REG_BIT(0x10, 28),/*VNC*/
 	RST_DAC		= _REG_BIT(0x10, 29),/*VNC*/
@@ -684,13 +687,10 @@ void rcc_osc_ready_int_disable(enum rcc_osc osc);
 int rcc_osc_ready_int_flag(enum rcc_osc osc);
 void rcc_css_int_clear(void);
 int rcc_css_int_flag(void);
-void rcc_wait_for_osc_ready(enum rcc_osc osc);
 void rcc_osc_on(enum rcc_osc osc);
 void rcc_osc_off(enum rcc_osc osc);
 void rcc_css_enable(void);
 void rcc_css_disable(void);
-void rcc_osc_bypass_enable(enum rcc_osc osc);
-void rcc_osc_bypass_disable(enum rcc_osc osc);
 void rcc_set_sysclk_source(uint32_t clk);
 void rcc_set_pll_multiplication_factor(uint32_t mul);
 void rcc_set_pll2_multiplication_factor(uint32_t mul);

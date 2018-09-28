@@ -38,9 +38,16 @@
 #include <libopencm3/stm32/memorymap.h>
 #include <libopencm3/cm3/common.h>
 
+/*****************************************************************************/
+/* Module definitions                                                        */
+/*****************************************************************************/
+
+/*****************************************************************************/
+/* Register definitions                                                      */
+/*****************************************************************************/
+
 /**@{*/
 
-/* Ethernet MAC registers */
 #define ETH_MACCR			MMIO32(ETHERNET_BASE + 0x00)
 #define ETH_MACFFR			MMIO32(ETHERNET_BASE + 0x04)
 #define ETH_MACHTHR			MMIO32(ETHERNET_BASE + 0x08)
@@ -114,6 +121,10 @@
 #define	ETH_DES5(base)			ETH_DES(5, base)
 #define	ETH_DES6(base)			ETH_DES(6, base)
 #define	ETH_DES7(base)			ETH_DES(7, base)
+
+/*****************************************************************************/
+/* Register values                                                           */
+/*****************************************************************************/
 
 /*---------------------------------------------------------------------------*/
 /* MACCR --------------------------------------------------------------------*/
@@ -697,6 +708,10 @@
 #define ETH_RDES4_PFT			(1<<12)
 #define ETH_RDES4_PV			(1<<13)
 
+/*****************************************************************************/
+/* API definitions                                                           */
+/*****************************************************************************/
+
 enum eth_clk {
 	ETH_CLK_025_035MHZ = ETH_MACMIIAR_CR_HCLK_DIV_16,
 	ETH_CLK_035_060MHZ = ETH_MACMIIAR_CR_HCLK_DIV_26,
@@ -704,6 +719,10 @@ enum eth_clk {
 	ETH_CLK_100_150MHZ = ETH_MACMIIAR_CR_HCLK_DIV_62,
 	ETH_CLK_150_168MHZ = ETH_MACMIIAR_CR_HCLK_DIV_102,
 };
+
+/*****************************************************************************/
+/* API Functions                                                             */
+/*****************************************************************************/
 
 BEGIN_DECLS
 
@@ -713,7 +732,7 @@ void eth_smi_bit_op(uint8_t phy, uint8_t reg, uint16_t bits, uint16_t mask);
 void eth_smi_bit_clear(uint8_t phy, uint8_t reg, uint16_t clearbits);
 void eth_smi_bit_set(uint8_t phy, uint8_t reg, uint16_t setbits);
 
-void eth_set_mac(uint8_t *mac);
+void eth_set_mac(const uint8_t *mac);
 void eth_desc_init(uint8_t *buf, uint32_t nTx, uint32_t nRx, uint32_t cTx,
 		    uint32_t cRx, bool isext);
 bool eth_tx(uint8_t *ppkt, uint32_t n);

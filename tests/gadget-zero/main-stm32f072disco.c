@@ -28,10 +28,10 @@
 /* no trace on cm0 #define ER_DEBUG */
 #ifdef ER_DEBUG
 #define ER_DPRINTF(fmt, ...) \
-    do { printf(fmt, ## __VA_ARGS__); } while (0)
+	do { printf(fmt, ## __VA_ARGS__); } while (0)
 #else
 #define ER_DPRINTF(fmt, ...) \
-    do { } while (0)
+	do { } while (0)
 #endif
 
 #include "trace.h"
@@ -59,7 +59,7 @@ int main(void)
 	ER_DPRINTF("bootup complete\n");
 	gpio_clear(GPIOC, GPIO7);
 	while (1) {
-		usbd_poll(usbd_dev);
+		gadget0_run(usbd_dev);
 	}
 
 }

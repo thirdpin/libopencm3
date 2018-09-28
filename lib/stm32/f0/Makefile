@@ -32,22 +32,27 @@ TGT_CFLAGS	= -Os \
 		  -mcpu=cortex-m0 $(FP_FLAGS) -mthumb -Wstrict-prototypes \
 		  -ffunction-sections -fdata-sections -MD -DSTM32F0
 TGT_CFLAGS      += $(DEBUG_FLAGS)
+TGT_CFLAGS	+= $(STANDARD_FLAGS)
 
 ARFLAGS		= rcs
 
-OBJS		= flash.o rcc.o usart.o dma.o rtc.o comparator.o crc.o \
-                  dac.o i2c.o iwdg.o pwr.o gpio.o timer.o adc.o desig.o
+OBJS		= can.o flash.o rcc.o dma.o rtc.o comparator.o \
+                  dac.o pwr.o gpio.o timer.o adc.o desig.o
 
-OBJS            += gpio_common_all.o gpio_common_f0234.o crc_common_all.o \
-                   pwr_common_all.o iwdg_common_all.o rtc_common_l1f024.o \
-                   dma_common_l1f013.o exti_common_all.o spi_common_all.o \
-		   spi_common_f03.o flash_common_f01.o dac_common_all.o \
-		   timer_common_all.o rcc_common_all.o
+OBJS            += gpio_common_all.o gpio_common_f0234.o crc_common_all.o crc_v2.o \
+                   pwr_common_v1.o iwdg_common_all.o rtc_common_l1f024.o \
+                   dma_common_l1f013.o exti_common_all.o \
+                   dac_common_all.o \
+                   timer_common_all.o timer_common_f0234.o rcc_common_all.o
+
 OBJS		+= adc_common_v2.o
 OBJS		+= crs_common_all.o
-OBJS		+= usart_common_v2.o
+OBJS		+= flash_common_all.o flash_common_f.o flash_common_f01.o
+OBJS		+= usart_common_all.o usart_common_v2.o
+OBJS		+= i2c_common_v2.o
+OBJS		+= spi_common_all.o spi_common_v2.o
 
-OBJS		+= usb.o usb_control.o usb_standard.o
+OBJS		+= usb.o usb_control.o usb_standard.o usb_msc.o
 OBJS		+= st_usbfs_core.o st_usbfs_v2.o
 
 VPATH += ../../usb:../:../../cm3:../common

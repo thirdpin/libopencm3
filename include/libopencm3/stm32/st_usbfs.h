@@ -1,4 +1,4 @@
-/* This provides unification of USB code for supported STM32F subfamilies */
+/* This provides unification of USB code for supported STM32 subfamilies */
 
 /*
  * This file is part of the libopencm3 project.
@@ -33,6 +33,8 @@
 #       include <libopencm3/stm32/l0/st_usbfs.h>
 #elif defined(STM32L1)
 #       include <libopencm3/stm32/l1/st_usbfs.h>
+#elif defined(STM32L4)
+#       include <libopencm3/stm32/l4/st_usbfs.h>
 #else
 #       error "STM32 family not defined or not supported."
 #endif

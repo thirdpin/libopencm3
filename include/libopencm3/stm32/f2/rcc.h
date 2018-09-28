@@ -165,6 +165,7 @@
 
 /* SWS: System clock switch status */
 #define RCC_CFGR_SWS_SHIFT			2
+#define RCC_CFGR_SWS_MASK			0x3
 #define RCC_CFGR_SWS_HSI			0x0
 #define RCC_CFGR_SWS_HSE			0x1
 #define RCC_CFGR_SWS_PLL			0x2
@@ -214,15 +215,30 @@
 #define RCC_AHB1RSTR_DMA2RST			(1 << 22)
 #define RCC_AHB1RSTR_DMA1RST			(1 << 21)
 #define RCC_AHB1RSTR_CRCRST			(1 << 12)
-#define RCC_AHB1RSTR_IOPIRST			(1 << 8)
-#define RCC_AHB1RSTR_IOPHRST			(1 << 7)
-#define RCC_AHB1RSTR_IOPGRST			(1 << 6)
-#define RCC_AHB1RSTR_IOPFRST			(1 << 5)
-#define RCC_AHB1RSTR_IOPERST			(1 << 4)
-#define RCC_AHB1RSTR_IOPDRST			(1 << 3)
-#define RCC_AHB1RSTR_IOPCRST			(1 << 2)
-#define RCC_AHB1RSTR_IOPBRST			(1 << 1)
-#define RCC_AHB1RSTR_IOPARST			(1 << 0)
+#define RCC_AHB1RSTR_GPIOIRST			(1 << 8)
+#define RCC_AHB1RSTR_GPIOHRST			(1 << 7)
+#define RCC_AHB1RSTR_GPIOGRST			(1 << 6)
+#define RCC_AHB1RSTR_GPIOFRST			(1 << 5)
+#define RCC_AHB1RSTR_GPIOERST			(1 << 4)
+#define RCC_AHB1RSTR_GPIODRST			(1 << 3)
+#define RCC_AHB1RSTR_GPIOCRST			(1 << 2)
+#define RCC_AHB1RSTR_GPIOBRST			(1 << 1)
+#define RCC_AHB1RSTR_GPIOARST			(1 << 0)
+
+/** @addtogroup deprecated_201802_rcc Deprecated 2018
+ * @deprecated replace zzz_IOPxRST with zzz_GPIOxRST
+ * @{
+ */
+#define RCC_AHB1RSTR_IOPIRST	RCC_AHB1RSTR_GPIOIRST
+#define RCC_AHB1RSTR_IOPHRST	RCC_AHB1RSTR_GPIOHRST
+#define RCC_AHB1RSTR_IOPGRST	RCC_AHB1RSTR_GPIOGRST
+#define RCC_AHB1RSTR_IOPFRST	RCC_AHB1RSTR_GPIOFRST
+#define RCC_AHB1RSTR_IOPERST	RCC_AHB1RSTR_GPIOERST
+#define RCC_AHB1RSTR_IOPDRST	RCC_AHB1RSTR_GPIODRST
+#define RCC_AHB1RSTR_IOPCRST	RCC_AHB1RSTR_GPIOCRST
+#define RCC_AHB1RSTR_IOPBRST	RCC_AHB1RSTR_GPIOBRST
+#define RCC_AHB1RSTR_IOPARST	RCC_AHB1RSTR_GPIOARST
+/**@}*/
 
 /* --- RCC_AHB2RSTR values ------------------------------------------------- */
 
@@ -288,15 +304,30 @@
 #define RCC_AHB1ENR_DMA1EN			(1 << 21)
 #define RCC_AHB1ENR_BKPSRAMEN			(1 << 18)
 #define RCC_AHB1ENR_CRCEN			(1 << 12)
-#define RCC_AHB1ENR_IOPIEN			(1 << 8)
-#define RCC_AHB1ENR_IOPHEN			(1 << 7)
-#define RCC_AHB1ENR_IOPGEN			(1 << 6)
-#define RCC_AHB1ENR_IOPFEN			(1 << 5)
-#define RCC_AHB1ENR_IOPEEN			(1 << 4)
-#define RCC_AHB1ENR_IOPDEN			(1 << 3)
-#define RCC_AHB1ENR_IOPCEN			(1 << 2)
-#define RCC_AHB1ENR_IOPBEN			(1 << 1)
-#define RCC_AHB1ENR_IOPAEN			(1 << 0)
+#define RCC_AHB1ENR_GPIOIEN			(1 << 8)
+#define RCC_AHB1ENR_GPIOHEN			(1 << 7)
+#define RCC_AHB1ENR_GPIOGEN			(1 << 6)
+#define RCC_AHB1ENR_GPIOFEN			(1 << 5)
+#define RCC_AHB1ENR_GPIOEEN			(1 << 4)
+#define RCC_AHB1ENR_GPIODEN			(1 << 3)
+#define RCC_AHB1ENR_GPIOCEN			(1 << 2)
+#define RCC_AHB1ENR_GPIOBEN			(1 << 1)
+#define RCC_AHB1ENR_GPIOAEN			(1 << 0)
+
+/** @addtogroup deprecated_201802_rcc Deprecated 2018
+ * @deprecated replace zzz_IOPxEN with zzz_GPIOxEN
+ * @{
+ */
+#define RCC_AHB1ENR_IOPIEN	RCC_AHB1ENR_GPIOIEN
+#define RCC_AHB1ENR_IOPHEN	RCC_AHB1ENR_GPIOHEN
+#define RCC_AHB1ENR_IOPGEN	RCC_AHB1ENR_GPIOGEN
+#define RCC_AHB1ENR_IOPFEN	RCC_AHB1ENR_GPIOFEN
+#define RCC_AHB1ENR_IOPEEN	RCC_AHB1ENR_GPIOEEN
+#define RCC_AHB1ENR_IOPDEN	RCC_AHB1ENR_GPIODEN
+#define RCC_AHB1ENR_IOPCEN	RCC_AHB1ENR_GPIOCEN
+#define RCC_AHB1ENR_IOPBEN	RCC_AHB1ENR_GPIOBEN
+#define RCC_AHB1ENR_IOPAEN	RCC_AHB1ENR_GPIOAEN
+/**@}*/
 
 /* --- RCC_AHB2ENR values ------------------------------------------------- */
 
@@ -367,15 +398,30 @@
 #define RCC_AHB1LPENR_SRAM1LPEN			(1 << 16)
 #define RCC_AHB1LPENR_FLITFLPEN			(1 << 15)
 #define RCC_AHB1LPENR_CRCLPEN			(1 << 12)
-#define RCC_AHB1LPENR_IOPILPEN			(1 << 8)
-#define RCC_AHB1LPENR_IOPHLPEN			(1 << 7)
-#define RCC_AHB1LPENR_IOPGLPEN			(1 << 6)
-#define RCC_AHB1LPENR_IOPFLPEN			(1 << 5)
-#define RCC_AHB1LPENR_IOPELPEN			(1 << 4)
-#define RCC_AHB1LPENR_IOPDLPEN			(1 << 3)
-#define RCC_AHB1LPENR_IOPCLPEN			(1 << 2)
-#define RCC_AHB1LPENR_IOPBLPEN			(1 << 1)
-#define RCC_AHB1LPENR_IOPALPEN			(1 << 0)
+#define RCC_AHB1LPENR_GPIOILPEN			(1 << 8)
+#define RCC_AHB1LPENR_GPIOHLPEN			(1 << 7)
+#define RCC_AHB1LPENR_GPIOGLPEN			(1 << 6)
+#define RCC_AHB1LPENR_GPIOFLPEN			(1 << 5)
+#define RCC_AHB1LPENR_GPIOELPEN			(1 << 4)
+#define RCC_AHB1LPENR_GPIODLPEN			(1 << 3)
+#define RCC_AHB1LPENR_GPIOCLPEN			(1 << 2)
+#define RCC_AHB1LPENR_GPIOBLPEN			(1 << 1)
+#define RCC_AHB1LPENR_GPIOALPEN			(1 << 0)
+
+/** @addtogroup deprecated_201802_rcc Deprecated 2018
+ * @deprecated replace zzz_IOPxLPEN with zzz_GPIOxLPEN
+ * @{
+ */
+#define RCC_AHB1LPENR_IOPILPEN	RCC_AHB1LPENR_GPIOILPEN
+#define RCC_AHB1LPENR_IOPHLPEN	RCC_AHB1LPENR_GPIOHLPEN
+#define RCC_AHB1LPENR_IOPGLPEN	RCC_AHB1LPENR_GPIOGLPEN
+#define RCC_AHB1LPENR_IOPFLPEN	RCC_AHB1LPENR_GPIOFLPEN
+#define RCC_AHB1LPENR_IOPELPEN	RCC_AHB1LPENR_GPIOELPEN
+#define RCC_AHB1LPENR_IOPDLPEN	RCC_AHB1LPENR_GPIODLPEN
+#define RCC_AHB1LPENR_IOPCLPEN	RCC_AHB1LPENR_GPIOCLPEN
+#define RCC_AHB1LPENR_IOPBLPEN	RCC_AHB1LPENR_GPIOBLPEN
+#define RCC_AHB1LPENR_IOPALPEN	RCC_AHB1LPENR_GPIOALPEN
+/**@}*/
 
 /* --- RCC_AHB2LPENR values ------------------------------------------------- */
 
@@ -453,6 +499,9 @@
 #define RCC_CSR_PINRSTF				(1 << 26)
 #define RCC_CSR_BORRSTF				(1 << 25)
 #define RCC_CSR_RMVF				(1 << 24)
+#define RCC_CSR_RESET_FLAGS	(RCC_CSR_LPWRRSTF | RCC_CSR_WWDGRSTF |\
+		RCC_CSR_IWDGRSTF | RCC_CSR_SFTRSTF | RCC_CSR_PORRSTF |\
+		RCC_CSR_PINRSTF | RCC_CSR_BORRSTF)
 #define RCC_CSR_LSIRDY				(1 << 1)
 #define RCC_CSR_LSION				(1 << 0)
 
@@ -501,9 +550,13 @@ struct rcc_clock_scale {
 
 extern const struct rcc_clock_scale rcc_hse_8mhz_3v3[RCC_CLOCK_3V3_END];
 
-typedef enum {
-	RCC_PLL, RCC_HSE, RCC_HSI, RCC_LSE, RCC_LSI
-} osc_t;
+enum rcc_osc {
+	RCC_PLL,
+	RCC_HSE,
+	RCC_HSI,
+	RCC_LSE,
+	RCC_LSI
+};
 
 #define _REG_BIT(base, bit)		(((base) << 5) + (bit))
 
@@ -729,20 +782,17 @@ enum rcc_periph_rst {
 
 BEGIN_DECLS
 
-void rcc_osc_ready_int_clear(osc_t osc);
-void rcc_osc_ready_int_enable(osc_t osc);
-void rcc_osc_ready_int_disable(osc_t osc);
-int rcc_osc_ready_int_flag(osc_t osc);
+void rcc_osc_ready_int_clear(enum rcc_osc osc);
+void rcc_osc_ready_int_enable(enum rcc_osc osc);
+void rcc_osc_ready_int_disable(enum rcc_osc osc);
+int rcc_osc_ready_int_flag(enum rcc_osc osc);
 void rcc_css_int_clear(void);
 int rcc_css_int_flag(void);
-void rcc_wait_for_osc_ready(osc_t osc);
-void rcc_wait_for_sysclk_status(osc_t osc);
-void rcc_osc_on(osc_t osc);
-void rcc_osc_off(osc_t osc);
+void rcc_wait_for_sysclk_status(enum rcc_osc osc);
+void rcc_osc_on(enum rcc_osc osc);
+void rcc_osc_off(enum rcc_osc osc);
 void rcc_css_enable(void);
 void rcc_css_disable(void);
-void rcc_osc_bypass_enable(osc_t osc);
-void rcc_osc_bypass_disable(osc_t osc);
 void rcc_set_sysclk_source(uint32_t clk);
 void rcc_set_pll_source(uint32_t pllsrc);
 void rcc_set_ppre2(uint32_t ppre2);

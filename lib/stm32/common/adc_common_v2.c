@@ -1,4 +1,5 @@
-/** @addtogroup adc_file
+/** @addtogroup adc_file ADC peripheral API
+@ingroup peripheral_apis
 
 @author @htmlonly &copy; @endhtmlonly
 2015 Karl Palsson <karlp@tweak.net.au>
@@ -82,7 +83,7 @@ void adc_power_on_async(uint32_t adc)
  */
 bool adc_is_power_on(uint32_t adc)
 {
-	return (ADC_ISR(adc) & ADC_ISR_ADRDY);
+	return ADC_ISR(adc) & ADC_ISR_ADRDY;
 }
 
 /**
@@ -106,9 +107,13 @@ void adc_power_on(uint32_t adc)
  */
 void adc_power_off_async(uint32_t adc)
 {
+	if (adc_is_power_off(adc)) {
+		return;
+	}
+
 	uint32_t checks = ADC_CR_ADSTART;
 	uint32_t stops = ADC_CR_ADSTP;
-#if defined (ADC_CR_JADSTART)
+#if defined(ADC_CR_JADSTART)
 	checks |= ADC_CR_JADSTART;
 	stops |= ADC_CR_JADSTP;
 #endif
@@ -126,7 +131,7 @@ void adc_power_off_async(uint32_t adc)
  */
 bool adc_is_power_off(uint32_t adc)
 {
-	return (!(ADC_CR(adc) & ADC_CR_ADEN));
+	return !(ADC_CR(adc) & ADC_CR_ADEN);
 }
 
 /**
@@ -140,6 +145,37 @@ void adc_power_off(uint32_t adc)
 {
 	adc_power_off_async(adc);
 	while (!adc_is_power_off(adc));
+}
+
+/**
+ * Start the ADC calibration and immediately return.
+ * @sa adc_calibrate
+ * @sa adc_is_calibrating
+ * @param adc ADC Block register address base @ref adc_reg_base
+ */
+void adc_calibrate_async(uint32_t adc)
+{
+	ADC_CR(adc) = ADC_CR_ADCAL;
+}
+
+/**
+ * Is the ADC Calibrating?
+ * @param adc ADC Block register address base @ref adc_reg_base
+ * @return true if the adc is currently calibrating
+ */
+bool adc_is_calibrating(uint32_t adc)
+{
+	return ADC_CR(adc) & ADC_CR_ADCAL;
+}
+
+/**
+ * Start ADC calibration and wait for it to finish
+ * @param adc ADC Block register address base @ref adc_reg_base
+ */
+void adc_calibrate(uint32_t adc)
+{
+	adc_calibrate_async(adc);
+	while (adc_is_calibrating(adc));
 }
 
 /**
@@ -340,8 +376,10 @@ void adc_disable_vrefint(void)
 
 /** @brief ADC Software Triggered Conversion on Regular Channels
  *
- * This starts conversion on a set of defined regular channels. It is cleared
- * by hardware once conversion starts.
+ * This starts conversion on a set of defined regular channels.
+ * Depending on the configuration bits EXTEN, a conversion will start
+ * immediately (software trigger configuration) or once a regular hardware
+ * trigger event occurs (hardware trigger configuration)
  *
  * @param[in] adc ADC block register address base @ref adc_reg_base
  */
@@ -349,8 +387,6 @@ void adc_start_conversion_regular(uint32_t adc)
 {
 	/* Start conversion on regular channels. */
 	ADC_CR(adc) |= ADC_CR_ADSTART;
-
-	/* Wait until the ADC starts the conversion. */
-	while (ADC_CR(adc) & ADC_CR_ADSTART);
 }
 
+/**@}*/

@@ -17,9 +17,6 @@
 ## along with this library.  If not, see <http://www.gnu.org/licenses/>.
 ##
 
-$(LDSCRIPT):$(OPENCM3_DIR)/ld/linker.ld.S
-ifeq ($(GENLINK_DEFS),)
-	$(error unknown device $(DEVICE) for the linker. Cannot generate ldscript)
-endif
-	@printf "  GENLNK  $@\n"
-	$(Q)$(CPP) $(GENLINK_DEFS) -P -E $< > $@
+$(LDSCRIPT): $(OPENCM3_DIR)/ld/linker.ld.S $(OPENCM3_DIR)/ld/devices.data
+	@printf "  GENLNK  $(DEVICE)\n"
+	$(Q)$(CPP) $(ARCH_FLAGS) $(shell $(OPENCM3_DIR)/scripts/genlink.py $(DEVICES_DATA) $(DEVICE) DEFS) -P -E $< > $@
