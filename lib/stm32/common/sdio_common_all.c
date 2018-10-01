@@ -1,5 +1,5 @@
-#include <libopencm3/stm32/sdio.h>
 #include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/sdio.h>
 
 void sdio_deinit()
 {
