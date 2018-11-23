@@ -96,12 +96,12 @@ struct _usbd_device {
 
 	uint16_t fifo_mem_top;
 	uint16_t fifo_mem_top_ep0;
-	uint8_t force_nak[4];
+	uint8_t force_nak[8];
 	/*
 	 * We keep a backup copy of the out endpoint size registers to restore
 	 * them after a transaction.
 	 */
-	uint32_t doeptsiz[4];
+	uint32_t doeptsiz[8];
 	/*
 	 * Received packet size for each endpoint. This is assigned in
 	 * stm32f107_poll() which reads the packet status push register GRXSTSP
