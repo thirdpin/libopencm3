@@ -3,7 +3,9 @@
 
 void sdio_deinit()
 {
+#ifndef STM32F1
 	rcc_periph_reset_pulse(RST_SDIO);
+#endif
 }
 
 void sdio_config(SDIO_config *config)
