@@ -141,7 +141,7 @@
 #define OTG_DIEPEACHMSK1_INEPNMM	(1 << 5)
 #define OTG_DIEPEACHMSK1_ITTXFEMSK	(1 << 4)
 #define OTG_DIEPEACHMSK1_TOM		(1 << 3)
-/* Bit 2 - Reserved */
+/* Bit 2 - Reserved */	
 #define OTG_DIEPEACHMSK1_EPDM		(1 << 1)
 #define OTG_DIEPEACHMSK1_XFRCM		(1 << 0)
 
@@ -169,5 +169,20 @@
 #define OTG_HCSPLT_XACTPOS_END		(0x1 << 14)
 #define OTG_HCSPLT_HUBADDR_MASK		(0x7f << 7)
 #define OTG_HCSPLT_PORTADDR_MASK	(0x7f << 0)
+
+/* OTG USB configuration register (OTG_GUSBCFG) */
+#define OTG_GUSBCFG_ULPIIPD         (1 << 25)
+#define OTG_GUSBCFG_PTCI            (1 << 24)
+#define OTG_GUSBCFG_PCCI            (1 << 23)
+#define OTG_GUSBCFG_TSDPS           (1 << 22)
+#define OTG_GUSBCFG_ULPIEVBUSI      (1 << 21)
+#define OTG_GUSBCFG_ULPIEVBUSD      (1 << 20)
+#define OTG_GUSBCFG_ULPICSM         (1 << 19)
+#define OTG_GUSBCFG_ULPIAR          (1 << 18)
+#define OTG_GUSBCFG_ULPIFSLS        (1 << 17)
+#define OTG_GUSBCFG_PHYLPCS         (1 << 15)
+
+/* OTG device configuration register (OTG_DCFG) */
+#define OTG_DCFG_DSPD_FS_EXT (0x2 << 0) 
 
 #endif
