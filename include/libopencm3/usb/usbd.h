@@ -55,11 +55,13 @@ typedef struct _usbd_device usbd_device;
 extern const usbd_driver st_usbfs_v1_usb_driver;
 extern const usbd_driver stm32f107_usb_driver;
 extern const usbd_driver stm32f207_usb_driver;
+extern const usbd_driver stm32_dwc_usb_driver;
 extern const usbd_driver stm32_dwc_usb_driver_ulpi;
 extern const usbd_driver st_usbfs_v2_usb_driver;
 #define otgfs_usb_driver stm32f107_usb_driver
 #define otghs_usb_driver stm32f207_usb_driver
-#define otghs_usb_driver_ulpi stm32_dwc_usb_driver_ulpi
+#define otghs_usb_driver_dwc stm32_dwc_usb_driver
+#define otghs_usb_driver_dwc_ulpi stm32_dwc_usb_driver_ulpi
 extern const usbd_driver efm32lg_usb_driver;
 extern const usbd_driver efm32hg_usb_driver;
 extern const usbd_driver lm4f_usb_driver;

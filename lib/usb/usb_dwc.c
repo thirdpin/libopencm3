@@ -25,6 +25,7 @@
 #include <libopencm3/usb/dwc/otg_hs.h>
 #include "usb_private.h"
 #include "usb_dwc_common.h"
+#include "libopencm3/stm32/memorymap.h"
 
 /* Receive FIFO size in 32-bit words. */
 #define RX_FIFO_SIZE 512
@@ -113,16 +114,9 @@ static usbd_device *stm32_dwc_usbd_init(void)
 static usbd_device *stm32_dwc_ulpi_usbd_init(void)
 {
 	rcc_periph_clock_enable(RCC_OTGHS);
-	OTG_HS_GINTSTS = OTG_GINTSTS_MMIS;
-
-	/* Disable internal PHY */
-	OTG_HS_GCCFG &= ~(OTG_GCCFG_PWRDWN);
-
-	/* Init The ULPI Interface */
-	OTG_HS_GUSBCFG &= ~(OTG_GUSBCFG_TSDPS | OTG_GUSBCFG_ULPIFSLS | OTG_GUSBCFG_PHYSEL);
-
-    /* Select vbus source */
-    OTG_HS_GUSBCFG &= ~(OTG_GUSBCFG_ULPIEVBUSD | OTG_GUSBCFG_ULPIEVBUSI);
+	__asm__("dsb"); // Errata RCC peripheral limitation
+    rcc_periph_clock_enable(RCC_OTGHSULPI);
+	__asm__("dsb"); // Errata RCC peripheral limitation
 
 	/* Wait for AHB idle. */
 	while (!(OTG_HS_GRSTCTL & OTG_GRSTCTL_AHBIDL));
@@ -131,16 +125,35 @@ static usbd_device *stm32_dwc_ulpi_usbd_init(void)
 	while (OTG_HS_GRSTCTL & OTG_GRSTCTL_CSRST);
 
 	/* Force peripheral only mode. */
-	OTG_HS_GUSBCFG |= OTG_GUSBCFG_FDMOD | OTG_GUSBCFG_TRDT_MASK;
-
+	OTG_HS_GUSBCFG |= OTG_GUSBCFG_FDMOD;
 	/* Full speed external ULPI PHY device. */
-	OTG_HS_DCFG |= OTG_DCFG_DSPD_FS_EXT;
+	OTG_HS_DCFG |= OTG_DCFG_DSPD_HS_EXT;
 
 	/* Restart the PHY clock. */
 	OTG_HS_PCGCCTL = 0;
 
-	OTG_HS_GRXFSIZ = stm32_dwc_usb_driver.rx_fifo_size;
-	usbd_dev.fifo_mem_top = stm32_dwc_usb_driver.rx_fifo_size;
+	OTG_HS_GRXFSIZ = stm32_dwc_usb_driver_ulpi.rx_fifo_size;
+	usbd_dev.fifo_mem_top = stm32_dwc_usb_driver_ulpi.rx_fifo_size;
+
+    /* Flush the FIFOs */
+    OTG_HS_GRSTCTL = (OTG_GRSTCTL_TXFFLSH | (0x10U << 6));
+    while ((OTG_HS_GRSTCTL & OTG_GRSTCTL_TXFFLSH) == OTG_GRSTCTL_TXFFLSH)
+        ;
+
+    OTG_HS_GRSTCTL = OTG_GRSTCTL_RXFFLSH;
+    while ((OTG_HS_GRSTCTL & OTG_GRSTCTL_RXFFLSH) == OTG_GRSTCTL_RXFFLSH)
+        ;
+
+    /* Clear all pending Device Interrupts */
+	OTG_HS_DIEPMSK = 0U;
+	OTG_HS_DOEPMSK = 0U;
+	OTG_HS_DAINTMSK = 0U;
+
+	/* Disable all interrupts. */
+	OTG_HS_GINTMSK = 0U;
+
+	/* Clear any pending interrupts */
+	OTG_HS_GINTSTS = 0xBFFFFFFFU;
 
 	/* Unmask interrupts for TX and RX. */
 	OTG_HS_GAHBCFG |= OTG_GAHBCFG_GINT;
@@ -149,6 +162,7 @@ static usbd_device *stm32_dwc_ulpi_usbd_init(void)
 			 OTG_GINTMSK_IEPINT |
 			 OTG_GINTMSK_USBSUSPM |
 			 OTG_GINTMSK_WUIM;
+
 	OTG_HS_DAINTMSK = 0xF;
 	OTG_HS_DIEPMSK = OTG_DIEPMSK_XFRCM;
 

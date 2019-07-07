@@ -183,6 +183,16 @@
 #define OTG_GUSBCFG_PHYLPCS         (1 << 15)
 
 /* OTG device configuration register (OTG_DCFG) */
-#define OTG_DCFG_DSPD_FS_EXT (0x2 << 0) 
+#define OTG_DCFG_DSPD_HS_EXT (0x0 << 0) 
+#define OTG_DCFG_DSPD_FS_EXT (0x1 << 0) 
+
+/* OTG AHB configuration register (OTG_GAHBCFG) */
+#define OTG_GAHBCFG_HBSTLEN_MASK    (0xf << 1)
+#define OTG_GAHBCFG_HBSTLEN_SINGLE  (0b0000 << 1)
+#define OTG_GAHBCFG_HBSTLEN_INCR    (0b0001 << 1)
+#define OTG_GAHBCFG_HBSTLEN_INCR4   (0b0011 << 1)
+#define OTG_GAHBCFG_HBSTLEN_INCR8   (0b0101 << 1)
+#define OTG_GAHBCFG_HBSTLEN_INCR16  (0b0111 << 1)
+#define OTG_GAHBCFG_DMAEN           (1 << 5)
 
 #endif
