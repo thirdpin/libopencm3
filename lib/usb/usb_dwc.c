@@ -33,6 +33,19 @@
 static usbd_device *stm32_dwc_usbd_init(void);
 static usbd_device *stm32_dwc_ulpi_usbd_init(void);
 
+/*---------------------------------------------------------------------------*/
+/** @brief Issue Pipeline Stall
+
+Issue a pipeline stall to make sure all write operations completed.
+
+After performing a data write operation and before using peripheral,
+the software can issue a DSB instruction to guarantee the 
+completion of a previous data write operation.
+
+*/
+
+static inline void pipeline_stall(void);
+
 static struct _usbd_device usbd_dev;
 
 const struct _usbd_driver stm32_dwc_usb_driver = {
@@ -114,9 +127,9 @@ static usbd_device *stm32_dwc_usbd_init(void)
 static usbd_device *stm32_dwc_ulpi_usbd_init(void)
 {
 	rcc_periph_clock_enable(RCC_OTGHS);
-	__asm__("dsb"); // Errata RCC peripheral limitation
+	pipeline_stall()
     rcc_periph_clock_enable(RCC_OTGHSULPI);
-	__asm__("dsb"); // Errata RCC peripheral limitation
+	pipeline_stall()
 
 	/* Wait for AHB idle. */
 	while (!(OTG_HS_GRSTCTL & OTG_GRSTCTL_AHBIDL));
@@ -130,7 +143,7 @@ static usbd_device *stm32_dwc_ulpi_usbd_init(void)
 	OTG_HS_DCFG |= OTG_DCFG_DSPD_HS_EXT;
 
 	/* Restart the PHY clock. */
-	OTG_HS_PCGCCTL = 0;
+	OTG_HS_PCGCCTL = 0U;
 
 	OTG_HS_GRXFSIZ = stm32_dwc_usb_driver_ulpi.rx_fifo_size;
 	usbd_dev.fifo_mem_top = stm32_dwc_usb_driver_ulpi.rx_fifo_size;
@@ -163,8 +176,13 @@ static usbd_device *stm32_dwc_ulpi_usbd_init(void)
 			 OTG_GINTMSK_USBSUSPM |
 			 OTG_GINTMSK_WUIM;
 
-	OTG_HS_DAINTMSK = 0xF;
+	OTG_HS_DAINTMSK = 0xFU;
 	OTG_HS_DIEPMSK = OTG_DIEPMSK_XFRCM;
 
 	return &usbd_dev;
+}
+
+static inline void pipeline_stall(void)
+{
+	__asm__ volatile("dsb":::"memory");
 }

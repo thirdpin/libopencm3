@@ -248,7 +248,7 @@
 #define OTG_DCTL_RWUSIG		(1 << 0)
 
 /* OTG device configuration register (OTG_DCFG) */
-#define OTG_DCFG_DSPD_MASK  (0x3 << 0)
+#define OTG_DCFG_DSPD_MASK  (0b11 << 0)
 #define OTG_DCFG_DSPD_FS_INT 0x0003 
 #define OTG_DCFG_DSPD 		OTG_DCFG_DSPD_FS_INT
 #define OTG_DCFG_NZLSOHSK	0x0004

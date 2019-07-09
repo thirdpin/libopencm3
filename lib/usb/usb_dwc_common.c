@@ -119,7 +119,7 @@ void dwc_endpoints_reset(usbd_device *usbd_dev)
 	usbd_dev->fifo_mem_top = usbd_dev->fifo_mem_top_ep0;
 
 	/* Disable any currently active endpoints */
-	for (i = 1; i < 8; i++) {
+	for (i = 1; i < ENDPOINT_COUNT; i++) {
 		if (REBASE(OTG_DOEPCTL(i)) & OTG_DOEPCTL0_EPENA) {
 			REBASE(OTG_DOEPCTL(i)) |= OTG_DOEPCTL0_EPDIS;
 		}
@@ -339,7 +339,7 @@ void dwc_poll(usbd_device *usbd_dev)
 	 * There is no global interrupt flag for transmit complete.
 	 * The XFRC bit must be checked in each OTG_DIEPINT(x).
 	 */
-	for (i = 0; i < 8; i++) { /* Iterate over endpoints. */
+	for (i = 0; i < ENDPOINT_COUNT; i++) { /* Iterate over endpoints. */
 		if (REBASE(OTG_DIEPINT(i)) & OTG_DIEPINTX_XFRC) {
 			/* Transfer complete. */
 			if (usbd_dev->user_callback_ctr[i]
