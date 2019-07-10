@@ -127,9 +127,9 @@ static usbd_device *stm32_dwc_usbd_init(void)
 static usbd_device *stm32_dwc_ulpi_usbd_init(void)
 {
 	rcc_periph_clock_enable(RCC_OTGHS);
-	pipeline_stall()
+	pipeline_stall();
     rcc_periph_clock_enable(RCC_OTGHSULPI);
-	pipeline_stall()
+	pipeline_stall();
 
 	/* Wait for AHB idle. */
 	while (!(OTG_HS_GRSTCTL & OTG_GRSTCTL_AHBIDL));
