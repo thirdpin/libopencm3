@@ -1,6 +1,6 @@
-/** @defgroup STM32L1xx-rcc-file RCC
+/** @defgroup rcc_file RCC peripheral API
 
-@ingroup STM32L1xx
+@ingroup peripheral_apis
 
 @brief <b>libopencm3 STM32L1xx Reset and Clock Control</b>
 
@@ -535,6 +535,10 @@ void rcc_clock_setup_pll(const struct rcc_clock_scale *clock)
 	flash_prefetch_enable();
 	flash_set_ws(clock->flash_waitstates);
 
+	/* Disable PLL oscillator before changing its configuration. */
+	rcc_osc_off(RCC_PLL);
+
+	/* Configure the PLL oscillator. */
 	rcc_set_pll_configuration(clock->pll_source, clock->pll_mul,
 				  clock->pll_div);
 

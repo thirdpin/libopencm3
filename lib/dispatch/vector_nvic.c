@@ -16,6 +16,11 @@
 #	include "../stm32/l1/vector_nvic.c"
 #elif defined(STM32L4)
 #	include "../stm32/l4/vector_nvic.c"
+#elif defined(STM32G0)
+#	include "../stm32/g0/vector_nvic.c"
+
+#elif defined(GD32F1X0)
+#	include "../gd32/f1x0/vector_nvic.c"
 
 #elif defined(EFM32TG)
 #	include "../efm32/tg/vector_nvic.c"
@@ -65,6 +70,9 @@
 
 #elif defined(MSP432E4)
 #       include "../msp432/e4/vector_nvic.c"
+
+#elif defined(SWM050)
+#       include "../swm050/vector_nvic.c"
 
 #else
 #	warning "no interrupts defined for chipset;"\
