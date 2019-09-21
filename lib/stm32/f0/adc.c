@@ -117,7 +117,7 @@ void adc_disable_discontinuous_mode(uint32_t adc)
  * @par
  *
  * @param[in] adc Unsigned int32. ADC base address (@ref adc_reg_base)
- * @param[in] adc ::adc_opmode. ADC operation mode (@ref adc_opmode)
+ * @param[in] opmode ADC operation mode
  */
 
 void adc_set_operation_mode(uint32_t adc, enum adc_opmode opmode)
@@ -277,6 +277,16 @@ bool adc_get_eoc_sequence_flag(uint32_t adc)
 	return ADC_ISR(adc) & ADC_ISR_EOSEQ;
 }
 
+/*---------------------------------------------------------------------------*/
+/** @brief ADC Clear Regular End-Of-Conversion Sequence Flag
+ *
+ * @param[in] adc Unsigned int32. ADC base address (@ref adc_reg_base)
+ */
+
+void adc_clear_eoc_sequence_flag(uint32_t adc)
+{
+	ADC_ISR(adc) = ADC_ISR_EOSEQ;
+}
 
 /**@}*/
 
@@ -291,12 +301,12 @@ bool adc_get_eoc_sequence_flag(uint32_t adc)
  *@{*/
 
 /*---------------------------------------------------------------------------*/
-/** @brief ADC Set Clock Prescale
+/** @brief ADC Set Clock Source
  *
  * The ADC clock taken from the many sources.
  *
  * @param[in] adc Unsigned int32. ADC base address (@ref adc_reg_base)
- * @param[in] prescale Unsigned int32. Prescale value (@ref adc_api_clksource)
+ * @param[in] source Unsigned int32. Source (@ref adc_api_clksource)
  */
 
 void adc_set_clk_source(uint32_t adc, uint32_t source)

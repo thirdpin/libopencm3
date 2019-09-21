@@ -38,6 +38,10 @@
 #       include <libopencm3/stm32/l1/rcc.h>
 #elif defined(STM32L4)
 #       include <libopencm3/stm32/l4/rcc.h>
+#elif defined(STM32G0)
+#       include <libopencm3/stm32/g0/rcc.h>
+#elif defined(GD32F1X0)
+#       include <libopencm3/gd32/f1x0/rcc.h>
 #else
 #       error "stm32 family not defined."
 #endif

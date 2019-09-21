@@ -1,7 +1,10 @@
-/** @addtogroup rng_file
+/** @addtogroup rng_file RNG peripheral API
+ * @ingroup peripheral_apis
  *
- * This library supports the random number generator peripheral (RNG) in the
- * STM32F4 series of ARM Cortex Microcontrollers by ST Microelectronics.
+ * This library supports "version 1" of the random number generator
+ * peripheral (RNG) in the STM32 series of ARM Cortex Microcontrollers
+ * by ST Microelectronics.  This is a common peripheral available on multiple
+ * devices in the family.
  *
  * LGPL License Terms @ref lgpl_license
  */
@@ -44,7 +47,7 @@ void rng_enable(void)
 /** Randomizes a number (non-blocking).
  * Can fail if a clock error or seed error is detected. Consult the Reference
  * Manual, but "try again", potentially after resetting the peripheral
- * @param pointer to a uint32_t that will be randomized.
+ * @param rand_nr pointer to a uint32_t that will be randomized.
  * @returns true on success, pointer is only written to on success
  * @sa rng_get_random_blocking
  */
