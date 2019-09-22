@@ -535,10 +535,6 @@ static void scsi_inquiry(usbd_mass_storage *ms,
 				set_sbc_status_good(ms);
 			}
 			else if (code_page == 0x80) { // Unit serial number page
-				/* Fix for Windows. */
-				/* It takes to many time to init MSC device on Windows without
-				this responce handler. */
-
 				uint8_t* responce = trans->msd_buf;
 				const uint8_t responce_len = sizeof(_spc3_inquiry_unit_sn_response);
 
