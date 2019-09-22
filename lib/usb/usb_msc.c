@@ -180,6 +180,7 @@ struct _usbd_mass_storage {
 	const char *vendor_id;
 	const char *product_id;
 	const char *product_revision_level;
+	const char *product_serial;
 	uint32_t block_count;
 
 	int (*read_block)(uint32_t lba, uint8_t *copy_to);
@@ -229,6 +230,24 @@ static const uint8_t _spc3_request_sense[18] = {
 	0x00,	/* Byte 15: SKSV = 0, SenseKeySpecific[0] = 0 */
 	0x00,	/* Byte 16: SenseKeySpecific[0] = 0 */
 	0x00	/* Byte 17: SenseKeySpecific[0] = 0 */
+};
+
+static const uint8_t _spc3_inquiry_unit_sn_response[20] = {
+	0x00, /* Byte 0: Peripheral Qualifier = 0, Peripheral Device Type = 0 */
+	0x80, /* Byte 1: Page code: Unit Serial Number page */
+	0x00, /* Byte 2: Reserved */
+	0x0f, /* Byte 3: Page length */
+		/* Byte 4 - Byte 19: Product Serial Number */
+	0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 
+};
+
+static const uint8_t _spc3_inquiry_supported_vpd_pages_response[6] = {
+	0x00, /* Byte 0: Peripheral Qualifier = 0, Peripheral Device Type = 0 */
+	0x00, /* Byte 1: Page code: Supported Vital Product Data pages */
+	0x00, /* Byte 2: Reserved */
+	0x02, /* Byte 3: Page length */
+		/* Byte 4 - Byte 5: SUPPORTED PAGE LIST */
+	0x00, 0x80
 };
 
 /*-- SCSI Layer --------------------------------------------------------------*/
@@ -377,6 +396,38 @@ static void scsi_format_unit(usbd_mass_storage *ms,
 	}
 }
 
+static void scsi_read_format_capacities(usbd_mass_storage *ms, struct usb_msc_trans *trans, enum trans_event event)
+{
+	if (EVENT_CBW_VALID == event) {
+		uint32_t bytes_to_write = 0;
+		
+		// Maximum Capacity Descriptor
+		// Capacity List Header
+		trans->msd_buf[bytes_to_write++] = 0;
+		trans->msd_buf[bytes_to_write++] = 0;
+		trans->msd_buf[bytes_to_write++] = 0;
+		trans->msd_buf[bytes_to_write++] = 8;
+
+		// Number of Blocks
+		trans->msd_buf[bytes_to_write++] = ms->block_count >> 24;
+		trans->msd_buf[bytes_to_write++] = 0xff & (ms->block_count >> 16);
+		trans->msd_buf[bytes_to_write++] = 0xff & (ms->block_count >> 8);
+		trans->msd_buf[bytes_to_write++] = 0xff & ms->block_count;
+
+		// Desc Type
+		trans->msd_buf[bytes_to_write++] = 0x2;
+
+		// Block Length
+		trans->msd_buf[bytes_to_write++] = 0;
+		trans->msd_buf[bytes_to_write++] = 2;
+		trans->msd_buf[bytes_to_write++] = 0;
+
+		trans->bytes_to_write = bytes_to_write;
+
+		set_sbc_status_good(ms);
+	}
+}
+
 static void scsi_request_sense(usbd_mass_storage *ms,
 			       struct usb_msc_trans *trans,
 			       enum trans_event event)
@@ -469,9 +520,50 @@ static void scsi_inquiry(usbd_mass_storage *ms,
 				sizeof(_spc3_inquiry_response);
 
 			set_sbc_status_good(ms);
-		} else {
+		}
+		else if (evpd == 1) {
+			const uint8_t code_page = buf[2];
+			if (code_page == 0x0) { // Supported Vital Product Data pages
+				uint8_t* responce = trans->msd_buf;
+				const uint8_t responce_len = sizeof(_spc3_inquiry_supported_vpd_pages_response);
+
+				memcpy(responce, _spc3_inquiry_supported_vpd_pages_response, responce_len);
+
+				trans->csw.csw.dCSWDataResidue = responce_len;
+				trans->bytes_to_write = responce_len;
+
+				set_sbc_status_good(ms);
+			}
+			else if (code_page == 0x80) { // Unit serial number page
+				/* Fix for Windows. */
+				/* It takes to many time to init MSC device on Windows without
+				this responce handler. */
+
+				uint8_t* responce = trans->msd_buf;
+				const uint8_t responce_len = sizeof(_spc3_inquiry_unit_sn_response);
+
+				memcpy(responce, _spc3_inquiry_unit_sn_response, responce_len);
+
+				uint8_t* serial = responce + 4;
+				uint8_t serial_len = MIN(strlen(ms->product_serial), 15);
+				memcpy(serial, ms->product_serial, serial_len);
+
+				trans->csw.csw.dCSWDataResidue = responce_len;
+				trans->bytes_to_write = responce_len;
+
+				set_sbc_status_good(ms);
+			}
+			else {
+				/* Do not support other pages */
+				set_sbc_status(ms, SBC_SENSE_KEY_ILLEGAL_REQUEST,
+							SBC_ASC_INVALID_COMMAND_OPERATION_CODE,
+							SBC_ASCQ_NA);
+
+				trans->bytes_to_write = 0;
+				trans->bytes_to_read = 0;
+				trans->csw.csw.bCSWStatus = CSW_STATUS_FAILED;
+			}
 			/* TODO: Add VPD 0x83 support */
-			/* TODO: Add VPD 0x00 support */
 		}
 	}
 }
@@ -526,6 +618,9 @@ static void scsi_command(usbd_mass_storage *ms,
 	case SCSI_WRITE_10:
 		scsi_write_10(ms, trans, event);
 		break;
+	case SCSI_READ_FORMAT_CAPACITIES:
+		scsi_read_format_capacities(ms, trans, event);
+	 	break;
 	default:
 		set_sbc_status(ms, SBC_SENSE_KEY_ILLEGAL_REQUEST,
 					SBC_ASC_INVALID_COMMAND_OPERATION_CODE,
@@ -790,6 +885,8 @@ static void msc_set_config(usbd_device *usbd_dev, uint16_t wValue)
 @param[in] product_id The SCSI product ID to return.  Maximum used length is 16.
 @param[in] product_revision_level The SCSI product revision level to return.
 		Maximum used length is 4.
+@param[in] product_serial The SCSI unit serial number. Maximum used 
+        length is 15.
 @param[in] block_count The number of 512-byte blocks available.
 @param[in] read_block The function called when the host requests to read a LBA
 		block.  Must _NOT_ be NULL.
@@ -804,6 +901,7 @@ usbd_mass_storage *usb_msc_init(usbd_device *usbd_dev,
 				 const char *vendor_id,
 				 const char *product_id,
 				 const char *product_revision_level,
+				 const char *product_serial,
 				 const uint32_t block_count,
 				 int (*read_block)(uint32_t lba,
 						   uint8_t *copy_to),
@@ -818,6 +916,7 @@ usbd_mass_storage *usb_msc_init(usbd_device *usbd_dev,
 	_mass_storage.vendor_id = vendor_id;
 	_mass_storage.product_id = product_id;
 	_mass_storage.product_revision_level = product_revision_level;
+	_mass_storage.product_serial = product_serial;
 	_mass_storage.block_count = block_count - 1;
 	_mass_storage.read_block = read_block;
 	_mass_storage.write_block = write_block;
