@@ -41,7 +41,8 @@ LGPL License Terms @ref lgpl_license
 #define MAX_USER_CONTROL_CALLBACK	4
 #define MAX_USER_SET_CONFIG_CALLBACK	4
 
-#define ENDPOINT_COUNT 8
+#ifndef ENDPOINT_COUNT
+#define ENDPOINT_COUNT 4
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
