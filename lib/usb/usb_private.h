@@ -43,6 +43,7 @@ LGPL License Terms @ref lgpl_license
 
 #ifndef ENDPOINT_COUNT
 #define ENDPOINT_COUNT 4
+#endif
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
